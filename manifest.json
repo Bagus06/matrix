@@ -1,0 +1,22 @@
+{
+    "short_name": "MATRIX",
+    "name": "MATRIX",
+    "description": "Modway Administration & Training Resource Information Exchange",
+    "icons": [{
+            "src": "./assets/img/logo/appslogo-192.png",
+            "type": "image/png",
+            "sizes": "192x192"
+        },
+        {
+            "src": "./assets/img/logo/appslogo-512.png",
+            "type": "image/png",
+            "sizes": "512x512"
+        }
+    ],
+    "id": "/MATRIX",
+    "start_url": "/",
+    "background_color": "#3367D6",
+    "orientation": "landscape",
+    "display": "fullscreen",
+    "scope": "/"
+}

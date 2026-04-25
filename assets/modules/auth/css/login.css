@@ -1,0 +1,41 @@
+.login-box,
+.register-box {
+    width: 30vw;
+}
+
+.login-page {
+    height: 80vh;
+}
+
+@media (max-width: 576px) {
+    .login-box,
+    .register-box {
+        width: 90vw;
+    }
+}
+
+.brand-image {
+    width: 200px;
+}
+
+.card,
+.login-card-body {
+    border-radius: 25px;
+}
+
+html,
+body {
+    height: 100%;
+    overflow: hidden;
+    position: fixed;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-attachment: fixed;
+}

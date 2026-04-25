@@ -1,0 +1,15 @@
+.colum-nowrap {
+    white-space: nowrap !important;
+}
+
+.colum-left {
+    text-align: left !important;
+}
+
+.colum-right {
+    text-align: right !important;
+}
+
+.colum-center {
+    text-align: center !important;
+}

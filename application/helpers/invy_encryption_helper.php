@@ -1,0 +1,77 @@
+<?php if (!defined("BASEPATH")) exit("No direct script access allowed");
+
+if (!function_exists('encryptcst')) {
+    function encryptcst($string)
+    {
+
+        $output = false;
+        /*
+* read security.ini file & get encryption_key | iv | encryption_mechanism value for generating encryption code
+*/
+        $security = parse_ini_file("security.ini");
+        $secret_key = $security["encryption_key"];
+        $secret_iv = $security["iv"];
+        $encrypt_method = $security["encryption_mechanism"];
+
+        // hash
+        $key = hash("sha256", $secret_key);
+
+        // iv – encrypt method AES-256-CBC expects 16 bytes – else you will get a warning
+        $iv = substr(hash("sha256", $secret_iv), 0, 16);
+
+        //do the encryption given text/string/number
+        $result = openssl_encrypt($string, $encrypt_method, $key, 0, $iv);
+        $output = base64_encode($result);
+        return $output;
+    }
+}
+
+
+if (!function_exists('decryptcst')) {
+    function decryptcst($string)
+    {
+
+        $output = false;
+        /*
+        * read security.ini file & get encryption_key | iv | encryption_mechanism value for generating encryption code
+        */
+
+        $security = parse_ini_file("security.ini");
+        $secret_key = $security["encryption_key"];
+        $secret_iv = $security["iv"];
+        $encrypt_method = $security["encryption_mechanism"];
+
+        // hash
+        $key = hash("sha256", $secret_key);
+
+        // iv – encrypt method AES-256-CBC expects 16 bytes – else you will get a warning
+        $iv = substr(hash("sha256", $secret_iv), 0, 16);
+
+        //do the decryption given text/string/number
+
+        $output = openssl_decrypt(base64_decode($string), $encrypt_method, $key, 0, $iv);
+        return $output;
+    }
+}
+
+if (!function_exists('encrypt')) {
+    function encrypt($string = '')
+    {
+        $key = '';
+        if (!empty($string)) {
+            $key = password_hash($string, PASSWORD_DEFAULT);
+        }
+        return $key;
+    }
+}
+
+if (!function_exists('decrypt')) {
+    function decrypt($string = '', $current_key = '')
+    {
+        $key = '';
+        if (!empty($string) && !empty($current_key)) {
+            $key = password_verify($string, $current_key);
+        }
+        return $key;
+    }
+}

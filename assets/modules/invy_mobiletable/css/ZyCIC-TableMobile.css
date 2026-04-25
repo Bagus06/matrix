@@ -1,0 +1,35 @@
+.table-mobile-loading {
+    text-align: center;
+    padding: 10px;
+    display: none;
+}
+
+.table-mobile-loading img {
+    width: 28px;
+    /* adjust size */
+    height: 28px;
+    vertical-align: middle;
+}
+
+.table td {
+    vertical-align: middle !important;
+}
+
+.tm-detailed {
+    -webkit-touch-callout: none;
+    user-select: none;
+}
+
+tr:has(.tm-row-active) {
+    background: #e3f2fd;
+}
+
+tr:has(.tm-rowhold-active) {
+    background: #cceaff;
+    user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-user-drag: none;
+    cursor: pointer;
+}

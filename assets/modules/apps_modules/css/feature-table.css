@@ -1,0 +1,33 @@
+td {
+    position: relative;
+}
+
+tr.strikeout {
+    pointer-events: none;
+}
+
+tr.strikeout textarea {
+    pointer-events: none;
+}
+
+tr.strikeout input {
+    pointer-events: none;
+}
+
+tr.strikeout .select2-container {
+    position: revert !important;
+    pointer-events: none;
+}
+
+tr.strikeout td:before {
+    content: " ";
+    position: absolute;
+    top: 30%;
+    left: 0;
+    border-bottom: 1px solid #111;
+    width: 100%;
+}
+
+.action-column {
+    pointer-events: all !important;
+}

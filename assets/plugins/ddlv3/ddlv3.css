@@ -1,0 +1,63 @@
+.dd {
+    display: none;
+}
+
+.dd-wrapper {
+    position: absolute;
+    z-index: 1;
+}
+
+.dd-menu {
+    list-style-type: none;
+    width: max-content;
+    min-width: 200px;
+    max-width: 300px;
+    max-height: 70vh;
+    padding: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    font-size: 16px;
+    word-wrap: break-word;
+    background-color: rgb(251, 251, 251);
+    box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15)!important;
+    border-radius: 0.2rem;
+}
+
+.dd-menu>.dd-item>a {
+    color: rgb(35, 35, 35);
+    text-decoration: none;
+    display: block;
+    padding-top: 0.50rem;
+    padding-bottom: 0.50rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+.dd-item {
+    position: static;
+    list-style-type: none;
+}
+
+.dd-item:hover {
+    background-color: rgb(239, 239, 239);
+}
+
+.dd-item .dd-menu> {
+    margin: 0;
+}
+
+.dd-item .dd-wrapper {
+    position: absolute;
+    z-index: 10;
+    display: none;
+    cursor: auto;
+}
+
+.dd-item:hover>.dd-wrapper {
+    display: block;
+}
+
+
+/* li:nth-of-type(odd) {
+    background-color: #e9e9f9 ;
+} */
