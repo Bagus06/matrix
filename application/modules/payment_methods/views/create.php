@@ -35,22 +35,22 @@
     </div>
     <div class="form-group">
         <label id="lbl-account_identifier">Account Identifier <label class="text-danger">*</label></label>
-        <input type="text" class="form-control bg-transparant" style="text-transform: uppercase;" name="account_identifier" minlength="3" maxlength="100" value="<?= @$utilitys['data']['account_identifier'] ?>" required>
+        <input type="text" class="form-control bg-transparant" name="account_identifier" minlength="3" maxlength="100" value="<?= @$utilitys['data']['account_identifier'] ?>" required>
         <small class="text-danger pl-3" id="err-account_identifier" style="display: none;"></small>
     </div>
     <div class="form-group">
         <label id="lbl-bank_name">Bank Name</label>
-        <input type="text" class="form-control bg-transparant" style="text-transform: uppercase;" name="bank_name" minlength="0" maxlength="100" value="<?= @$utilitys['data']['bank_name'] ?>">
+        <input type="text" class="form-control bg-transparant" name="bank_name" minlength="0" maxlength="100" value="<?= @$utilitys['data']['bank_name'] ?>">
         <small class="text-danger pl-3" id="err-bank_name" style="display: none;"></small>
     </div>
     <div class="form-group">
         <label id="lbl-branch_name">Branch Name</label>
-        <input type="text" class="form-control bg-transparant" style="text-transform: uppercase;" name="branch_name" minlength="0" maxlength="100" value="<?= @$utilitys['data']['branch_name'] ?>">
+        <input type="text" class="form-control bg-transparant" name="branch_name" minlength="0" maxlength="100" value="<?= @$utilitys['data']['branch_name'] ?>">
         <small class="text-danger pl-3" id="err-branch_name" style="display: none;"></small>
     </div>
     <div class="form-group">
         <label id="lbl-ifsc_code">IFSC Code</label>
-        <input type="text" class="form-control bg-transparant" style="text-transform: uppercase;" name="ifsc_code" minlength="0" maxlength="100" value="<?= @$utilitys['data']['ifsc_code'] ?>">
+        <input type="text" class="form-control bg-transparant" name="ifsc_code" minlength="0" maxlength="100" value="<?= @$utilitys['data']['ifsc_code'] ?>">
         <small class="text-danger pl-3" id="err-ifsc_code" style="display: none;"></small>
     </div>
     <div class="form-group">

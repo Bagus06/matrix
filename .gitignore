@@ -42,5 +42,11 @@ application/logs/*
 
 /assets/img/profile/*
 !assets/img/profile/default_profile.png
+/uploads/aadhaar/*
+/uploads/photo/*
+/uploads/certificate1/*
+/uploads/certificate2/*
+/uploads/certificate3/*
+/uploads/certificate4/*
 
 .env

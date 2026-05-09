@@ -10,12 +10,12 @@ class Students extends CI_Controller
 {
     protected $module = 'students';
     protected $module_alias = 'STD';
-    protected $default_column_order = array(null, 'student_number', 'full_name', 'phone', 'whatsapp_number', 'email', 'university_name', 'course_name', 'students.country', 'students.state', 'students.city', 'created_at');
+    protected $default_column_order = array(null, 'student_number', 'full_name', 'phone', 'email', 'university_name', 'course_name', null, null, 'leads.assigned_to_name', 'students.created_at');
     protected $default_order = [
         "column" => "student_number",
         "order" => "ASC"
     ];
-    protected $default_column_select = 'students.*, university_name, short_name, course_name, course_code';
+    protected $default_column_select = 'students.*, university_name, short_name, course_name, course_code, leads.assigned_to_name';
 
     public function __construct()
     {
@@ -226,13 +226,12 @@ class Students extends CI_Controller
                 $row[] = $edit;
                 $row[] = $value['full_name'];
                 $row[] = $value['phone'];
-                $row[] = $value['whatsapp_number'];
                 $row[] = $value['email'];
                 $row[] = $value['university_name'] . ((!empty($value['short_name'])) ? ' ( ' . $value['short_name'] . ' )' : '');
                 $row[] = $value['course_name'] . ((!empty($value['course_code'])) ? ' ( ' . $value['course_code'] . ' )' : '');
-                $row[] = $value['country'];
-                $row[] = $value['state'];
-                $row[] = $value['city'];
+                $row[] = $value['city'] . ', ' . $value['state'] . ', ' . $value['country'];
+                $row[] = ((!empty($value['additional_certificate']) && hasDecimalValue($value['additional_certificate_fee'])) ? $value['additional_certificate'] . ' ( ' . $value['additional_certificate_fee'] . ' )' : 'None');
+                $row[] = $value['assigned_to_name'];
                 $row[] = date('d F Y', strtotime($value['created_at']));
                 $row[] = $action;
                 $tb_data[] = $row;
@@ -272,6 +271,8 @@ class Students extends CI_Controller
                 'source_code' => @$datas['source_code'],
                 'tax_percent' => @$datas['tax_percent'],
                 'advance_percent' => @$datas['advance_percent'],
+                'aditional_discount_percent' => @$datas['aditional_discount_percent'],
+                'additional_certificate_fee' => @$datas['additional_certificate_fee'],
             ]);
 
             if (!empty($fees['data'])) {
@@ -282,7 +283,7 @@ class Students extends CI_Controller
                 $datas['advance_percent'] = @$datas['advance_percent'];
                 $datas['advance_amount'] = $fees['data']['advance_amount'];
                 $datas['remaining_balance'] = $fees['data']['remaining_balance'];
-                $datas['final_payment'] = number_format((float) preg_match('/^\d+(\.\d{1,2})?$/', $amount = preg_replace('/[^0-9.]/', '', $fees['data']['final_payment'])) ? $amount : 0, 2);
+                $datas['final_payment'] = (float) preg_match('/^\d+(\.\d{1,2})?$/', $amount = preg_replace('/[^0-9.]/', '', $fees['data']['final_payment'])) ? $amount : 0;
             }
 
             if (!empty($detailed_payment['data']['id'])) {
@@ -330,9 +331,12 @@ class Students extends CI_Controller
                 'source_code' => @$datas['source_code'],
                 'tax_percent' => @$datas['tax_percent'],
                 'advance_percent' => @$datas['advance_percent'],
+                'aditional_discount_percent' => @$datas['aditional_discount_percent'],
+                'additional_certificate_fee' => @$datas['additional_certificate_fee'],
             ]);
+
             if (!empty($fees['data'])) {
-                $datas['amount'] = number_format($fees['data']['advance_amount'] - ($fees['data']['advance_amount'] * (number_format((float) @$datas['tax_percent'], 2) / 100)), 2);
+                $datas['amount'] = $fees['data']['advance_amount'] - ($fees['data']['advance_amount'] * ((float) @$datas['tax_percent'] / 100));
                 $datas['tax_percent'] = @$datas['tax_percent'];
                 $datas['final_amount'] = $fees['data']['advance_amount'];
                 $datas['final_amount'] = $fees['data']['advance_amount'];
@@ -525,8 +529,6 @@ class Students extends CI_Controller
                     $detailed_payment = $this->payments_model->detailed(0, 'student_number = ' . $this->db->escape($input_post['student_number']));
 
                     $input_post['invoice_number'] = @$detailed_payment['data']['invoice_number'];
-                    $input_post['tax_percent'] = @$detailed_payment['data']['tax_percent'];
-                    $input_post['advance_percent'] = @$detailed_payment['data']['advance_percent'];
                     $payments = $this->create_or_edit_payments($input_post);
                     $toastr[] = $payments;
 

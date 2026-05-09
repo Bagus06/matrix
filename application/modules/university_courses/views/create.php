@@ -105,7 +105,7 @@
                         <input type="number" class="form-control bg-transparant" name="final_fee" placeholder="Enter amount (INR)" inputmode="decimal" step="0.01" min="0" title="Enter amount in Indian Rupees (numbers only, up to 2 decimals)" value="<?= @$utilitys['data']['final_fee'] ?>" readonly required>
                         <small class="text-danger pl-3" id="err-final_fee" style="display: none;"></small>
                     </div>
-                    <div class="form-group">
+                    <!-- <div class="form-group">
                         <label id="lbl-discount_percent">Discount (Percent)</label>
                         <input type="number" class="form-control bg-transparant" name="discount_percent" min="0" max="100" value="<?= @$utilitys['data']['discount_percent'] ?>">
                         <small class="text-danger pl-3" id="err-discount_percent" style="display: none;"></small>
@@ -114,6 +114,11 @@
                         <label id="lbl-discount_date_periode">Discount validity period</label>
                         <input type="text" class="form-control bg-transparant" name="discount_date_periode" value="<?= @$utilitys['data']['discount_date_periode'] ?>">
                         <small class="text-danger pl-3" id="err-discount_date_periode" style="display: none;"></small>
+                    </div> -->
+                    <div class="form-group">
+                        <label id="lbl-last_updated_fees">Last Updated Fee</label>
+                        <input type="text" class="form-control bg-transparant" name="last_updated_fees" value="<?= @$utilitys['data']['last_updated_fees'] ?>" readonly>
+                        <small class="text-danger pl-3" id="err-last_updated_fees" style="display: none;"></small>
                     </div>
                 </div>
                 <div class="col-md-12 col-md-4 col-xl-4">

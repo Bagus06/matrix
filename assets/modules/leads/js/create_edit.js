@@ -1,4 +1,4 @@
-$(document).ready(function () {
+$(document).ready(function() {
     var queryMandatory = [
         $('input[name="student_number"]'),
         $('input[name="date_of_birth"]'),
@@ -26,7 +26,7 @@ $(document).ready(function () {
     function setMandatory(status) {
         if (status == 'YES') {
             // Loop for set mandatory input
-            $.each(queryMandatory, function (key, value) {
+            $.each(queryMandatory, function(key, value) {
                 let $label = $('#lbl-' + value.attr('name'));
                 let label = $label.text()
 
@@ -41,7 +41,7 @@ $(document).ready(function () {
             })
         } else {
             // Loop for remove mandatory input
-            $.each(queryMandatory, function (key, value) {
+            $.each(queryMandatory, function(key, value) {
                 let $label = $('#lbl-' + value.attr('name'));
 
                 value.attr('required', false)
@@ -58,6 +58,7 @@ $(document).ready(function () {
         let invoiceNumber = $('input[name="invoice_number"]').val()
         let tax_percent = $('input[name="tax_percent"]').val()
         let advancePercent = $('input[name="advance_percent"]').val()
+        let additionalCertificateFee = $('input[name="additional_certificate_fee"]').val()
 
         if (status === 'YES') {
             $.ajax({
@@ -69,34 +70,35 @@ $(document).ready(function () {
                     course_id: courseID,
                     source_code: sourceCode,
                     tax_percent: tax_percent,
-                    advance_percent: advancePercent
+                    advance_percent: advancePercent,
+                    additional_certificate_fee: additionalCertificateFee
                 },
-                beforeSend: function () {
+                beforeSend: function() {
                     $.loader('show')
                 },
-                success: function (response) {
+                success: function(response) {
                     if (response.status) {
                         $('input[name="final_fees"]').val(response.data.final_amount)
                         $('input[name="total_amount"]').val(response.data.total_amount)
                         $('input[name="discount_percent"]').val(response.data.discount_percent)
-                        $('input[name="advance_amount"]').val(response.data.advance_amount)
                         $('input[name="final_amount"]').val(response.data.final_amount)
+                        $('input[name="advance_amount"]').val(response.data.advance_amount)
                         $('input[name="remaining_balance"]').val(response.data.remaining_balance)
                     } else {
                         $('input[name="final_fees"]').val('')
                         $('input[name="total_amount"]').val('')
                         $('input[name="discount_percent"]').val('')
-                        $('input[name="advance_amount"]').val('')
                         $('input[name="final_amount"]').val('')
+                        $('input[name="advance_amount"]').val('')
                         $('input[name="remaining_balance"]').val('')
                     }
                 },
-                error: function () {
+                error: function() {
                     $('input[name="final_fees"]').val('')
                     $('input[name="total_amount"]').val('')
                     $('input[name="discount_percent"]').val('')
-                    $('input[name="advance_amount"]').val('')
                     $('input[name="final_amount"]').val('')
+                    $('input[name="advance_amount"]').val('')
                     $('input[name="remaining_balance"]').val('')
                 }
             })
@@ -109,14 +111,14 @@ $(document).ready(function () {
                     type: 'GET',
                     async: true,
                     dataType: 'json',
-                    success: function (response) {
+                    success: function(response) {
                         if (response.status) {
                             $('input[name="student_number"]').val(response.data.number)
                         } else {
                             $('input[name="student_number"]').val('')
                         }
                     },
-                    error: function () {
+                    error: function() {
                         $('input[name="student_number"]').val('')
                     }
                 })
@@ -134,14 +136,14 @@ $(document).ready(function () {
                             data: {
                                 number: studentNumber
                             },
-                            success: function (response) {
+                            success: function(response) {
                                 if (response.status) {
                                     $('input[name="student_number"]').val(response.data.number)
                                 } else {
                                     $('input[name="student_number"]').val('')
                                 }
                             },
-                            error: function () {
+                            error: function() {
                                 $('input[name="student_number"]').val('')
                             }
                         })
@@ -160,14 +162,14 @@ $(document).ready(function () {
                     type: 'GET',
                     async: true,
                     dataType: 'json',
-                    success: function (response) {
+                    success: function(response) {
                         if (response.status) {
                             $('input[name="invoice_number"]').val(response.data.number)
                         } else {
                             $('input[name="invoice_number"]').val('')
                         }
                     },
-                    error: function () {
+                    error: function() {
                         $('input[name="invoice_number"]').val('')
                     }
                 })
@@ -185,14 +187,14 @@ $(document).ready(function () {
                             data: {
                                 number: invoiceNumber
                             },
-                            success: function (response) {
+                            success: function(response) {
                                 if (response.status) {
                                     $('input[name="invoice_number"]').val(response.data.number)
                                 } else {
                                     $('input[name="invoice_number"]').val('')
                                 }
                             },
-                            error: function () {
+                            error: function() {
                                 $('input[name="invoice_number"]').val('')
                             }
                         })
@@ -216,11 +218,11 @@ $(document).ready(function () {
         $.loader('hide')
     }
 
-    $('input[name="tax_percent"], input[name="advance_percent"]').on('input', function () {
+    $('input[name="tax_percent"], input[name="advance_percent"], input[name="additional_certificate_fee"]').on('input', function() {
         onChangeStatus()
     })
 
-    $('select[name="status"], select[name="course_id"], select[name="source_code"]').on('change', function () {
+    $('select[name="status"], select[name="course_id"], select[name="source_code"]').on('change', function() {
         onChangeStatus()
     })
 })

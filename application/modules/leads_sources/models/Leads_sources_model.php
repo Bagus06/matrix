@@ -688,8 +688,8 @@ class Leads_sources_model extends CI_model
                 'b2b_company_name' => substr(@$datas['b2b_company_name'], 0, 100),
                 'ref_name' => substr(@$datas['ref_name'], 0, 100),
                 'address' => @$datas['address'],
-                'discount' => @$datas['discount'],
-                'phone' => preg_replace('/[^0-9]/', '', substr(@$datas['phone'], 0, 13)),
+                'discount' => round((float) @$datas['discount'], 2),
+                'phone' => preg_replace('/[^0-9]/', '', substr(@$datas['phone'], 0, 15)),
                 'email' => substr(@$datas['email'], 0, 100),
                 'updated_by' => get_user()['id']
             ];

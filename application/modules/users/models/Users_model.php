@@ -271,7 +271,7 @@ class Users_model extends CI_model
                     $values = '';
                     foreach ($datas as $key => $value) {
                         // Check for the same value. If there is a similarity in the value between the one in the database and the one to be input, the input will not be processed.
-                        if ((($value == 0) == !empty($value)) && (@$item_detailed['data'][$key] != $value)) {
+                        if ((($value == 0) || !empty($value)) && (@$item_detailed['data'][$key] != $value)) {
                             $values .= "$key = " . $this->db->escape(trim($value)) . ', ';
                         }
                     }

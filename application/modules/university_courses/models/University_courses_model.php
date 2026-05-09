@@ -657,15 +657,15 @@ class University_courses_model extends CI_model
                 'course_name' => substr($datas['course_name'], 0, 100),
                 'course_level' => substr($datas['course_level'], 0, 50),
                 'course_type' => substr(@$datas['course_type'], 0, 50),
-                'duration_year' => number_format((float) preg_replace('/[^0-9.]/', '', $datas['duration_year']), 2, '.', ''),
+                'duration_year' => round((float) preg_replace('/[^0-9.]/', '', $datas['duration_year']), 0, 2),
                 'total_semesters' => preg_match('/^\d+(\.\d{1,2})?$/', $amount = preg_replace('/[^0-9.]/', '', $datas['total_semesters'])) ? $amount : 0,
-                'fee' => number_format((float) preg_match('/^\d+(\.\d{1,2})?$/', $amount = preg_replace('/[^0-9.]/', '', $datas['fee'])) ? $amount : 0, 2),
+                'fee' => round((float) preg_match('/^\d+(\.\d{1,2})?$/', $amount = preg_replace('/[^0-9.]/', '', $datas['fee'])) ? $amount : 0, 2),
                 'currency' => substr('INR', 0, 50),
                 'markup_fee_percent' => (int) @$datas['markup_fee_percent'],
                 'discount_percent' => (int) @$datas['discount_percent'],
                 'discount_duration_start' => '',
                 'discount_duration_end' => '',
-                'final_fee' => number_format((float) preg_match('/^\d+(\.\d{1,2})?$/', $amount = preg_replace('/[^0-9.]/', '', $datas['final_fee'])) ? $amount : 0, 2),
+                'final_fee' => round((float) preg_match('/^\d+(\.\d{1,2})?$/', $amount = preg_replace('/[^0-9.]/', '', $datas['final_fee'])) ? $amount : 0, 2),
                 'eligibility' => @$datas['eligibility'],
                 'description' => @$datas['description'],
                 'status' => ((strtoupper(@$datas['status']) === 'ON') ? 'ACTIVE' : 'INACTIVE'),
@@ -691,6 +691,10 @@ class University_courses_model extends CI_model
 
             if (!empty($id)) {
                 if (($id == @$exist['data']['id']) || empty($exist['data'])) {
+                    if ($exist['data']['final_fee'] != $data_post['final_fee']) {
+                        $data_post['last_updated_fees'] = date('Y-m-d');
+                    }
+
                     $output = $this->courses($id, $data_post, 'PATCH');
                     if (!empty($output['data'])) {
                         $output['data']['update'] = true;

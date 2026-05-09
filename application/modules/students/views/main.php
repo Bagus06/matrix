@@ -11,13 +11,12 @@
                                 <th col-type="">student_number</th>
                                 <th col-type="">full_name</th>
                                 <th col-type="">students.phone</th>
-                                <th col-type="">whatsapp_number</th>
                                 <th col-type="">students.email</th>
                                 <th col-type="">university_name</th>
                                 <th col-type="">course_name</th>
-                                <th col-type="">students.country</th>
-                                <th col-type="">students.state</th>
-                                <th col-type="">students.city</th>
+                                <th col-type="">CONCAT(students.country, ' ', students.state, ' ', students.city)</th>
+                                <th col-type="">additional_certificate</th>
+                                <th col-type="">assigned_to_name</th>
                                 <th col-type="datetimerange">students.created_at</th>
                                 <td col-type="" style="text-align:right"><?= (user_ag() == "mobile") ? "<button type='button' id='btn-col-search' class='btn btn-link'><i class='fa-solid fa-magnifying-glass'></i></button>" : "" ?></td>
                             </tr>
@@ -26,14 +25,13 @@
                                 <th>Student Number</th>
                                 <th>Name</th>
                                 <th>Phone</th>
-                                <th>WhatsApp</th>
                                 <th>Email</th>
                                 <th>University</th>
                                 <th>Course</th>
-                                <th>Country</th>
-                                <th>State</th>
-                                <th>City</th>
-                                <th>Date Created</th>
+                                <th>Place</th>
+                                <th>Additional certificate or attestation</th>
+                                <th>Assigned Counselor</th>
+                                <th>Document Submit Date</th>
                                 <th></th>
                             </tr>
                         </thead>

@@ -657,9 +657,10 @@ class Payment_methods_model extends CI_model
                 'method_code' => substr(strtoupper($datas['method_code']), 0, 15),
                 'method_name' => substr(strtoupper($datas['method_name']), 0, 50),
                 'category' => substr(strtoupper($datas['category']), 0, 50),
-                'account_name' => substr($datas['account_name'], 0, 100),
+                'account_name' => substr(strtoupper($datas['account_name']), 0, 100),
                 'account_identifier' => substr($datas['account_identifier'], 0, 100),
                 'bank_name' => substr($datas['bank_name'], 0, 100),
+                'branch_name' => substr($datas['branch_name'], 0, 100),
                 'ifsc_code' => substr($datas['ifsc_code'], 0, 20),
                 'status' => ((strtoupper(@$datas['status']) == 'ON') ? 'ACTIVE' : 'INACTIVE'),
                 'updated_by' => get_user()['id']

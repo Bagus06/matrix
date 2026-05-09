@@ -13,6 +13,22 @@
 <link rel="stylesheet" href="<?= base_url(); ?>assets/plugins/invy/col-table-style.invy.css">
 <link rel="stylesheet" href="<?= base_url(); ?>assets/plugins/select2/css/select2.min.css">
 <link rel="stylesheet" href="<?= base_url(); ?>assets/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
+<link rel="stylesheet" href="<?= base_url(); ?>assets/plugins/intl-tel-input/intlTelInput.css">
+<style>
+    .iti__flag {
+        background-image: url("<?= base_url('assets/plugins/intl-tel-input/img/flags.png'); ?>");
+    }
+
+    @media (min-resolution: 2x) {
+        .iti__flag {
+            background-image: url("<?= base_url('assets/plugins/intl-tel-input/img/flags@2x.png'); ?>");
+        }
+    }
+
+    .iti {
+        display: block !important;
+    }
+</style>
 <!-- ------------------------------------------ -->
 
 <link rel="stylesheet" href="<?= base_url() ?>assets/theme/AdminLTE-3.2.0/custom.style.css">

@@ -92,6 +92,26 @@ $config['error_codes'] = [
                 'cabtn' => TRUE,
                 'catext' => 'OK',
                 'redirectUrl' => null
+            ],
+            'E002' => [
+                'message' => 'Sorry, the uploaded file is too large.',
+                'hint'    => "",
+                'level'   => 'warning',
+                'cobtn' => FALSE,
+                'cotext' => null,
+                'cabtn' => TRUE,
+                'catext' => 'OK',
+                'redirectUrl' => null
+            ],
+            'E003' => [
+                'message' => 'Sorry, the selected file does not match the allowed format.',
+                'hint'    => "",
+                'level'   => 'warning',
+                'cobtn' => FALSE,
+                'cotext' => null,
+                'cabtn' => TRUE,
+                'catext' => 'OK',
+                'redirectUrl' => null
             ]
         ],
     ],
@@ -2215,6 +2235,26 @@ $config['error_codes'] = [
                 'catext' => 'OK',
                 'redirectUrl' => null
             ],
+            'E003' => [
+                'message' => 'Failed to upload document.',
+                'hint'    => 'Please ensure the file is valid and try again. If the issue persists, contact the administrator.',
+                'level'   => 'error',
+                'cobtn' => FALSE,
+                'cotext' => null,
+                'cabtn' => TRUE,
+                'catext' => 'OK',
+                'redirectUrl' => null
+            ],
+            'E004' => [
+                'message' => 'Invalid document data.',
+                'hint'    => 'The file name is missing or not detected. Please select a file and try again.',
+                'level'   => 'error',
+                'cobtn' => FALSE,
+                'cotext' => null,
+                'cabtn' => TRUE,
+                'catext' => 'OK',
+                'redirectUrl' => null
+            ],
         ],
     ],
 
@@ -2900,6 +2940,26 @@ $config['error_codes'] = [
             'E002' => [
                 'message' => 'A system error has occurred. Please report the problem to the administrator and check the system again.',
                 'hint'    => "insert data is empty.",
+                'level'   => 'error',
+                'cobtn' => FALSE,
+                'cotext' => null,
+                'cabtn' => TRUE,
+                'catext' => 'OK',
+                'redirectUrl' => null
+            ],
+            'E003' => [
+                'message' => 'Failed to upload document.',
+                'hint'    => 'Please ensure the file is valid and try again. If the issue persists, contact the administrator.',
+                'level'   => 'error',
+                'cobtn' => FALSE,
+                'cotext' => null,
+                'cabtn' => TRUE,
+                'catext' => 'OK',
+                'redirectUrl' => null
+            ],
+            'E004' => [
+                'message' => 'Invalid document data.',
+                'hint'    => 'The file name is missing or not detected. Please select a file and try again.',
                 'level'   => 'error',
                 'cobtn' => FALSE,
                 'cotext' => null,

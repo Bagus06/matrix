@@ -3,7 +3,9 @@ $('#tb-' + jsURI[1]).ssDtTable({
     table_main: true,
     identity: '',
     style: {
-        colNowrap: [1, 2, 6, 7, 11],
+        orderableCol: [7, 8],
+        colNowrap: [1, 2, 5, 6, 7, 8, 9, 10],
+        colAlRight: [],
         colW60: []
     }
 })

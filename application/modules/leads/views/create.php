@@ -23,12 +23,12 @@
                     </div>
                     <div class="form-group">
                         <label class="mb-0" id="lbl-phone">Phone <label class="text-danger">*</label></label>
-                        <input type="tel" class="form-control bg-transparent" name="phone" placeholder="91xxxxxxxxxx" minlength="10" maxlength="13" title="Enter a valid Indian phone number (e.g., 919876543210)" inputmode="tel" autocomplete="tel" value="<?= @$utilitys['data']['phone'] ?>" required>
+                        <input type="tel" class="form-control bg-transparent" name="phone" minlength="7" maxlength="15" inputmode="tel" autocomplete="tel" value="<?= @$utilitys['data']['phone'] ?>" required>
                         <small class="text-danger pl-3" id="err-phone" style="display: none;"></small>
                     </div>
                     <div class="form-group">
                         <label class="mb-0" id="lbl-whatsapp_number">WhatsApp</label>
-                        <input type="tel" class="form-control bg-transparent" name="whatsapp_number" placeholder="91xxxxxxxxxx" minlength="10" maxlength="13" title="Enter a valid Indian WhatsApp number (e.g., 919876543210)" inputmode="tel" autocomplete="tel" value="<?= @$utilitys['data']['whatsapp_number'] ?>">
+                        <input type="tel" class="form-control bg-transparent" name="whatsapp_number" minlength="7" maxlength="15" inputmode="tel" autocomplete="tel" value="<?= @$utilitys['data']['whatsapp_number'] ?>">
                         <small class="text-danger pl-3" id="err-whatsapp_number" style="display: none;"></small>
                     </div>
                     <div class="form-group">
@@ -40,8 +40,13 @@
                         <strong>Document</strong>
                     </div>
                     <div class="col-12">
-                        <button type="button" class="btn btn-sm btn-outline-primary pr-2" id="btnUploadAadhaar"><i class="fa-solid fa-address-card"></i> Aadhaar</button>
-                        <button type="button" class="btn btn-sm btn-outline-primary pr-2" id="btnUploadPhoto"><i class="fa-solid fa-image-portrait"></i> Photo</button>
+                        <button type="button" class="btn btn-sm btn-outline-primary pr-2 btnOpenUploadModal" data-inputname="file_aadhaar" data-modaltitle="Upload Aadhar" data-accept="image,pdf" data-fileurl="<?= base_url() . 'uploads/aadhaar/' . @$utilitys['data']['file_aadhaar'] . '?v=' . time() ?>" data-filetype="<?= pathinfo(FCPATH . 'uploads/aadhaar/' . @$utilitys['data']['file_aadhaar'], PATHINFO_EXTENSION) ?>"><i class="fa-solid fa-address-card"></i> Aadhaar</button>
+                        <input type="file" name="file_aadhaar" hidden>
+                        <input type="hidden" name="remove_file_aadhaar" value="0">
+
+                        <button type="button" class="btn btn-sm btn-outline-primary pr-2 btnOpenUploadModal" data-inputname="file_photo" data-modaltitle="Upload Photo" data-accept="image" data-fileurl="<?= base_url() . 'uploads/photo/' . @$utilitys['data']['file_photo'] . '?v=' . time() ?>" data-filetype="<?= pathinfo(FCPATH . 'uploads/photo/' . @$utilitys['data']['file_photo'], PATHINFO_EXTENSION) ?>"><i class="fa-solid fa-image-portrait"></i> Photo</button>
+                        <input type="file" name="file_photo" hidden>
+                        <input type="hidden" name="remove_file_photo" value="0">
                     </div>
                     <hr>
                     <span class="text-lg font-weight-bold"><i class="fa-solid fa-gears"></i> MORE INFORMATION</span>
@@ -150,6 +155,16 @@
                         <small class="text-danger pl-3" id="err-course_id" style="display: none;"></small>
                     </div>
                     <div class="form-group">
+                        <label class="mb-0" id="lbl-additional_certificate">Additional certificate or attestation</label>
+                        <textarea type="text" class="form-control bg-transparent" rows="2" name="additional_certificate" value="<?= @$utilitys['data_student']['additional_certificate'] ?>"><?= @$utilitys['data_student']['additional_certificate'] ?></textarea>
+                        <small class="text-danger pl-3" id="err-additional_certificate" style="display: none;"></small>
+                    </div>
+                    <div class="form-group">
+                        <label id="lbl-additional_certificate_fee">Additional certificate or attestation fee</label>
+                        <input type="number" class="form-control bg-transparant" name="additional_certificate_fee" placeholder="Enter amount (INR)" inputmode="decimal" step="0.01" min="0" title="Enter amount in Indian Rupees (numbers only, up to 2 decimals)" value="<?= @$utilitys['data_student']['additional_certificate_fee'] ?>">
+                        <small class="text-danger pl-3" id="err-additional_certificate_fee" style="display: none;"></small>
+                    </div>
+                    <div class="form-group">
                         <label class="mb-0" id="lbl-final_fees">Fees</label>
                         <input type="text" class="form-control bg-transparent" name="final_fees" value="<?= @$utilitys['data_student']['final_fees']; ?>" readonly>
                         <small class="text-danger pl-3" id="err-final_fees" style="display: none;"></small>
@@ -158,10 +173,21 @@
                         <strong>Document</strong>
                     </div>
                     <div class="col-12 pl-2 pr-2">
-                        <button type="button" class="btn btn-sm btn-outline-primary pr-2" id="btnUploadC1"><i class="fa-solid fa-cloud-arrow-up"></i> Certificate 1</button>
-                        <button type="button" class="btn btn-sm btn-outline-primary pr-2" id="btnUploadC2"><i class="fa-solid fa-cloud-arrow-up"></i> Certificate 2</button>
-                        <button type="button" class="btn btn-sm btn-outline-primary pr-2" id="btnUploadC3"><i class="fa-solid fa-cloud-arrow-up"></i> Certificate 3</button>
-                        <button type="button" class="btn btn-sm btn-outline-primary pr-2" id="btnUploadC4"><i class="fa-solid fa-cloud-arrow-up"></i> Certificate 4</button>
+                        <button type="button" class="btn btn-sm btn-outline-primary pr-2 btnOpenUploadModal" data-inputname="file_certificate1" data-modaltitle="Upload Certificate 1" data-accept="image,pdf" data-fileurl="<?= base_url() . 'uploads/certificate1/' . @$utilitys['data']['file_certificate1'] . '?v=' . time() ?>" data-filetype="<?= pathinfo(FCPATH . 'uploads/certificate1/' . @$utilitys['data']['file_certificate1'], PATHINFO_EXTENSION) ?>"><i class="fa-solid fa-address-card"></i> Certificate 1</button>
+                        <input type="file" name="file_certificate1" hidden>
+                        <input type="hidden" name="remove_file_certificate1" value="0">
+
+                        <button type="button" class="btn btn-sm btn-outline-primary pr-2 btnOpenUploadModal" data-inputname="file_certificate2" data-modaltitle="Upload Certificate 2" data-accept="image,pdf" data-fileurl="<?= base_url() . 'uploads/certificate2/' . @$utilitys['data']['file_certificate2'] . '?v=' . time() ?>" data-filetype="<?= pathinfo(FCPATH . 'uploads/certificate2/' . @$utilitys['data']['file_certificate2'], PATHINFO_EXTENSION) ?>"><i class="fa-solid fa-address-card"></i> Certificate 2</button>
+                        <input type="file" name="file_certificate2" hidden>
+                        <input type="hidden" name="remove_file_certificate2" value="0">
+
+                        <button type="button" class="btn btn-sm btn-outline-primary pr-2 btnOpenUploadModal" data-inputname="file_certificate3" data-modaltitle="Upload Certificate 3" data-accept="image,pdf" data-fileurl="<?= base_url() . 'uploads/certificate3/' . @$utilitys['data']['file_certificate3'] . '?v=' . time() ?>" data-filetype="<?= pathinfo(FCPATH . 'uploads/certificate3/' . @$utilitys['data']['file_certificate3'], PATHINFO_EXTENSION) ?>"><i class="fa-solid fa-address-card"></i> Certificate 3</button>
+                        <input type="file" name="file_certificate3" hidden>
+                        <input type="hidden" name="remove_file_certificate3" value="0">
+
+                        <button type="button" class="btn btn-sm btn-outline-primary pr-2 btnOpenUploadModal" data-inputname="file_certificate4" data-modaltitle="Upload Certificate 4" data-accept="image,pdf" data-fileurl="<?= base_url() . 'uploads/certificate4/' . @$utilitys['data']['file_certificate4'] . '?v=' . time() ?>" data-filetype="<?= pathinfo(FCPATH . 'uploads/certificate4/' . @$utilitys['data']['file_certificate4'], PATHINFO_EXTENSION) ?>"><i class="fa-solid fa-address-card"></i> Certificate 4</button>
+                        <input type="file" name="file_certificate4" hidden>
+                        <input type="hidden" name="remove_file_certificate4" value="0">
                     </div>
                     <hr>
                     <span class="text-lg font-weight-bold"><i class="fa-solid fa-user-plus"></i> LEADS INFORMATION</span>
@@ -237,8 +263,8 @@
                         <small class="text-danger pl-3" id="err-note" style="display: none;"></small>
                     </div>
                     <div class="form-group">
-                        <label class="mb-0" id="lbl-assigned_to">Assigned Agent <label class="text-danger mb-0">*</label></label>
-                        <select class="form-control bg-transparent" name="assigned_to" <?= ((!empty(@$utilitys['data']['assigned_to'])) ? 'readonly' : ''); ?> required>
+                        <label class="mb-0" id="lbl-assigned_to">Assigned Counselor <label class="text-danger mb-0">*</label></label>
+                        <select class="form-control bg-transparent" name="assigned_to" <?= ((user_group_check('GR_ADMIN', get_user()['id'])) ? '' : 'readonly'); ?> required>
                             <option value=""><span class="text-muted text-light text-italic">Select an Option</span></option>
                             <?php if (!empty($utilitys['assigned']['data']['data'])) : ?>
                                 <?php foreach ($utilitys['assigned']['data']['data'] as $key => $value) : ?>
@@ -291,7 +317,7 @@
                         <label class="mb-0" id="lbl-advance_amount">Advance</label>
                         <div class=" col-12 row pl-0 pr-0 mr-0">
                             <div class="col-8 pr-0 mr-0">
-                                <input type="number" class="form-control bg-transparant" name="advance_amount" placeholder="Enter amount (INR)" inputmode="decimal" step="0.01" min="0" title="Enter amount in Indian Rupees (numbers only, up to 2 decimals)" value="<?= @$utilitys['data_invoice']['final_amount'] ?>" readonly>
+                                <input type="number" class="form-control bg-transparant" name="advance_amount" placeholder="Enter amount (INR)" inputmode="decimal" step="0.01" min="0" title="Enter amount in Indian Rupees (numbers only, up to 2 decimals)" value="<?= @$utilitys['data_invoice']['advance_amount'] ?>" readonly>
                             </div>
                             <div class="col-4 pr-0 mr-0">
                                 <input type="number" class="form-control bg-transparant" name="advance_percent" inputmode="decimal" step="0.01" min="0" value="<?= @$utilitys['data_payment']['advance_percent'] ?>" <?= ((!empty($utilitys['data']['first_name'])) ? 'readonly' : '') ?>>

@@ -31,12 +31,17 @@ class ComposerStaticInit63da037b72a23988a036ae4a3e604889
             'Psr\\SimpleCache\\' => 16,
             'Psr\\Http\\Message\\' => 17,
             'PhpOption\\' => 10,
+            'PhpOffice\\PhpWord\\' => 18,
             'PhpOffice\\PhpSpreadsheet\\' => 25,
         ),
         'M' => 
         array (
             'MyCLabs\\Enum\\' => 13,
             'Matrix\\' => 7,
+        ),
+        'L' => 
+        array (
+            'Laminas\\Escaper\\' => 16,
         ),
         'G' => 
         array (
@@ -95,6 +100,10 @@ class ComposerStaticInit63da037b72a23988a036ae4a3e604889
         array (
             0 => __DIR__ . '/..' . '/phpoption/phpoption/src/PhpOption',
         ),
+        'PhpOffice\\PhpWord\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/phpoffice/phpword/src/PhpWord',
+        ),
         'PhpOffice\\PhpSpreadsheet\\' => 
         array (
             0 => __DIR__ . '/..' . '/phpoffice/phpspreadsheet/src/PhpSpreadsheet',
@@ -106,6 +115,10 @@ class ComposerStaticInit63da037b72a23988a036ae4a3e604889
         'Matrix\\' => 
         array (
             0 => __DIR__ . '/..' . '/markbaker/matrix/classes/src',
+        ),
+        'Laminas\\Escaper\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/laminas/laminas-escaper/src',
         ),
         'GrahamCampbell\\ResultType\\' => 
         array (

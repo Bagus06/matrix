@@ -22,6 +22,30 @@ if (!function_exists('apps_conf')) {
     }
 }
 
+if (!function_exists('INR')) {
+    function INR($amount = null)
+    {
+        $output = '';
+        if (!empty($amount)) {
+            $output = '₹ ' . $amount;
+        }
+        return $output;
+    }
+}
+
+if (!function_exists('hasDecimalValue')) {
+    function hasDecimalValue($value)
+    {
+        $parts = explode('.', (string)$value);
+
+        if (!isset($parts[1])) {
+            return false;
+        }
+
+        return (float)$parts[1] != 0;
+    }
+}
+
 if (!function_exists('remove_booked_number_not_used')) {
     function remove_booked_number_not_used()
     {

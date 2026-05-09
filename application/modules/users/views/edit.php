@@ -82,7 +82,7 @@
                     <tr>
                         <td id="lbl-phone">Phone / Mobile</td>
                         <td>
-                            <input type="tel" class="form-control bg-transparent" name="phone" placeholder="91xxxxxxxxxx" minlength="10" maxlength="12" title="Enter a valid Indian phone number (e.g., 919876543210)" inputmode="tel" autocomplete="tel" value="<?= @$utilitys['data']['phone'] ?>" required>
+                            <input type="tel" class="form-control bg-transparent" name="phone" minlength="7" maxlength="15" inputmode="tel" autocomplete="tel" value="<?= @$utilitys['data']['phone'] ?>" required>
                             <small class="text-danger pl-3" id="err-phone" style="display: none;"></small>
                         </td>
                     </tr>

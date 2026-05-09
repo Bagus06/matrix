@@ -7,6 +7,7 @@ class Students_model extends CI_model
     protected $tb1 = 'students';
     protected $tb2 = 'universities';
     protected $tb3 = 'university_courses';
+    protected $tb4 = 'leads';
 
     public function __construct()
     {
@@ -351,6 +352,7 @@ class Students_model extends CI_model
             $query .= 'SELECT ' . @$datas['select'] . " FROM $this->tb1";
             $query .= " INNER JOIN $this->tb2 ON $this->tb1.university_id = $this->tb2.id";
             $query .= " INNER JOIN $this->tb3 ON $this->tb1.course_id = $this->tb3.id";
+            $query .= " INNER JOIN $this->tb4 ON $this->tb1.enquiry_number = $this->tb4.enquiry_number";
 
             $query .= " WHERE $this->tb1.row_status = $row_status";
             $query .= $this->whereclause_system($datas["bypass"]);
@@ -569,6 +571,151 @@ class Students_model extends CI_model
         return $output;
     }
 
+    private function document_upload($enquiry_number = null, $document_type = 'unidentified', $datas = null)
+    {
+        $output = [
+            'status' => FALSE,
+            'code' => null,
+            'replace_code_value' => null,
+            'redirectUrl' => null,
+            'debug' => [
+                'file' => __FILE__,
+                'line' => __LINE__,
+                'hint' => ''
+            ],
+            'data' => null
+        ];
+
+        if (!empty($datas)) {
+            if (!empty($enquiry_number)) {
+                $enquiry_number = preg_replace('/\s+/', '-', trim(preg_replace('/[^a-zA-Z0-9\- ]/', '', @$enquiry_number)));
+                $document_type  = preg_replace('/\s+/', '-', trim(preg_replace('/[^a-zA-Z0-9\- ]/', '', @$document_type)));
+
+                $base_path = FCPATH . 'uploads/' . strtolower($document_type) . '/';
+
+                // create folder if not exists
+                if (!is_dir($base_path)) {
+                    mkdir($base_path, 0775, true);
+                }
+
+                $ext = strtolower(pathinfo($datas['name'], PATHINFO_EXTENSION));
+
+                $filename = strtolower($document_type) . '_' . strtolower(@$enquiry_number) . '.' . $ext;
+
+                $upload_process = move_uploaded_file(@$datas['tmp_name'], $base_path . $filename);
+                if ($upload_process) {
+                    $output = [
+                        'status' => TRUE,
+                        'code' => null,
+                        'replace_code_value' => null,
+                        'redirectUrl' => null,
+                        'debug' => null,
+                        'data' => [
+                            'enquiry_number' => strtolower($enquiry_number),
+                            'document_type' => strtolower($document_type),
+                            'filename' => $filename,
+                            'bash_path' => $base_path . $filename
+                        ]
+                    ];
+                } else {
+                    $output = [
+                        'status' => FALSE,
+                        'code' => "$this->error_prefix-CNU-E003",
+                        'replace_code_value' => null,
+                        'redirectUrl' => null,
+                        'debug' => [
+                            'file' => __FILE__,
+                            'line' => __LINE__,
+                            'hint' => ''
+                        ],
+                        'data' => null
+                    ];
+                }
+            } else {
+                $output = [
+                    'status' => FALSE,
+                    'code' => "$this->error_prefix-CNU-E002",
+                    'replace_code_value' => null,
+                    'redirectUrl' => null,
+                    'debug' => [
+                        'file' => __FILE__,
+                        'line' => __LINE__,
+                        'hint' => ''
+                    ],
+                    'data' => null
+                ];
+            }
+        } else {
+            $output = [
+                'status' => FALSE,
+                'code' => "$this->error_prefix-CNU-E002",
+                'replace_code_value' => null,
+                'redirectUrl' => null,
+                'debug' => [
+                    'file' => __FILE__,
+                    'line' => __LINE__,
+                    'hint' => ''
+                ],
+                'data' => null
+            ];
+        }
+
+        return $output;
+    }
+
+    private function document_remove($document_type = 'unidentified', $filename = null)
+    {
+        $output = [
+            'status' => FALSE,
+            'code' => null,
+            'replace_code_value' => null,
+            'redirectUrl' => null,
+            'debug' => [
+                'file' => __FILE__,
+                'line' => __LINE__,
+                'hint' => ''
+            ],
+            'data' => null
+        ];
+
+        if (!empty($filename)) {
+            $base_path = FCPATH . 'uploads/' . strtolower($document_type) . '/';
+
+            // create folder if not exists
+            if (!is_dir($base_path)) {
+                mkdir($base_path, 0775, true);
+            }
+
+            if (is_file($base_path . $filename)) {
+                unlink($base_path . $filename);
+            }
+
+            $output = [
+                'status' => TRUE,
+                'code' => null,
+                'replace_code_value' => null,
+                'redirectUrl' => null,
+                'debug' => null,
+                'data' => null
+            ];
+        } else {
+            $output = [
+                'status' => FALSE,
+                'code' => "$this->error_prefix-CNU-E004",
+                'replace_code_value' => null,
+                'redirectUrl' => null,
+                'debug' => [
+                    'file' => __FILE__,
+                    'line' => __LINE__,
+                    'hint' => ''
+                ],
+                'data' => null
+            ];
+        }
+
+        return $output;
+    }
+
     public function restore($id)
     {
         $output = [
@@ -658,7 +805,9 @@ class Students_model extends CI_model
                 'university_id' => @$datas['university_id'],
                 'course_id' => @$datas['course_id'],
                 'enquiry_number' => substr(strtoupper(@$datas['enquiry_number']), 0, 15),
-                'final_fees' => number_format((float) preg_match('/^\d+(\.\d{1,2})?$/', $amount = preg_replace('/[^0-9.]/', '', $datas['final_fees'])) ? $amount : 0, 2),
+                'final_fees' => round((float) preg_match('/^\d+(\.\d{1,2})?$/', $amount = preg_replace('/[^0-9.]/', '', $datas['final_fees'])) ? $amount : 0, 2),
+                'additional_certificate' => @$datas['additional_certificate'],
+                'additional_certificate_fee' => round((float) preg_match('/^\d+(\.\d{1,2})?$/', $amount = preg_replace('/[^0-9.]/', '', $datas['additional_certificate_fee'])) ? $amount : 0, 2),
                 'full_name' => substr($datas['first_name'] . ((!empty($datas['last_name'])) ? ' ' . trim($datas['last_name']) : ''), 0, 100),
                 'first_name' => substr($datas['first_name'], 0, 50),
                 'last_name' => substr(@$datas['last_name'], 0, 50),
@@ -676,6 +825,65 @@ class Students_model extends CI_model
                 'postal_code' => substr($datas['postal_code'], 0, 50),
                 'updated_by' => get_user()['id']
             ];
+
+            $leads_detailed = $this->leads_model->detailed('', "enquiry_number = '" . @$data_post['enquiry_number'] . "'");
+
+            /* ========================= Section Upload Document ========================= */
+            if (!empty($_FILES['file_aadhaar']['name'])) {
+                $aadhaar_upload = $this->document_upload($data_post['enquiry_number'], 'aadhaar', $_FILES['file_aadhaar']);
+                if ($aadhaar_upload['status']) {
+                    $data_post['file_aadhaar'] = @$aadhaar_upload['data']['filename'];
+                }
+            } elseif (!empty($leads_detailed['data']['file_aadhaar'])) {
+                $data_post['file_aadhaar'] =  $leads_detailed['data']['file_aadhaar'];
+            }
+
+            if (!empty($_FILES['file_photo']['name'])) {
+                $photo_upload = $this->document_upload($data_post['enquiry_number'], 'photo', $_FILES['file_photo']);
+                if ($photo_upload['status']) {
+                    $data_post['file_photo'] = @$photo_upload['data']['filename'];
+                }
+            } elseif (!empty($leads_detailed['data']['file_photo'])) {
+                $data_post['file_photo'] =  $leads_detailed['data']['file_photo'];
+            }
+
+            if (!empty($_FILES['file_certificate1']['name'])) {
+                $certificate1_upload = $this->document_upload($data_post['enquiry_number'], 'certificate1', $_FILES['file_certificate1']);
+                if ($certificate1_upload['status']) {
+                    $data_post['file_certificate1'] = @$certificate1_upload['data']['filename'];
+                }
+            } elseif (!empty($leads_detailed['data']['file_certificate1'])) {
+                $data_post['file_certificate1'] =  $leads_detailed['data']['file_certificate1'];
+            }
+
+            if (!empty($_FILES['file_certificate2']['name'])) {
+                $certificate2_upload = $this->document_upload($data_post['enquiry_number'], 'certificate2', $_FILES['file_certificate2']);
+                if ($certificate2_upload['status']) {
+                    $data_post['file_certificate2'] = @$certificate2_upload['data']['filename'];
+                }
+            } elseif (!empty($leads_detailed['data']['file_certificate2'])) {
+                $data_post['file_certificate2'] =  $leads_detailed['data']['file_certificate2'];
+            }
+
+            if (!empty($_FILES['file_certificate3']['name'])) {
+                $certificate3_upload = $this->document_upload($data_post['enquiry_number'], 'certificate3', $_FILES['file_certificate3']);
+                if ($certificate3_upload['status']) {
+                    $data_post['file_certificate3'] = @$certificate3_upload['data']['filename'];
+                }
+            } elseif (!empty($leads_detailed['data']['file_certificate3'])) {
+                $data_post['file_certificate3'] =  $leads_detailed['data']['file_certificate3'];
+            }
+
+            if (!empty($_FILES['file_certificate4']['name'])) {
+                $certificate4_upload = $this->document_upload($data_post['enquiry_number'], 'certificate4', $_FILES['file_certificate4']);
+                if ($certificate4_upload['status']) {
+                    $data_post['file_certificate4'] = @$certificate4_upload['data']['filename'];
+                }
+            } elseif (!empty($leads_detailed['data']['file_certificate4'])) {
+                $data_post['file_certificate4'] =  $leads_detailed['data']['file_certificate4'];
+            }
+
+            /* ===================================================================================== */
 
             // Unset key if datas is empty
             if (empty($datas['enquiry_number'])) {
@@ -725,6 +933,40 @@ class Students_model extends CI_model
             $exist = $this->detailed(null, "$this->tb1.row_status = 1 AND aadhaar_number = " . $this->db->escape($data_post['aadhaar_number']) . " AND $this->tb1.university_id = " . $this->db->escape(@$data_post['university_id']) . " AND $this->tb1.course_id = " . $this->db->escape(@$data_post['course_id']));
 
             if (!empty($id)) {
+
+                /* ====================== Section remove document ====================== */
+
+                if (!empty($datas['remove_file_aadhaar'])) {
+                    $data_post['file_aadhaar'] = NULL;
+                    $remove_document = $this->document_remove('aadhaar', @$exist['data']['file_aadhaar']);
+                }
+
+                if (!empty($datas['remove_file_photo'])) {
+                    $data_post['file_photo'] = NULL;
+                    $remove_document = $this->document_remove('photo', @$exist['data']['file_photo']);
+                }
+
+                if (!empty($datas['remove_file_certificate1'])) {
+                    $data_post['file_certificate1'] = NULL;
+                    $remove_document = $this->document_remove('certificate1', @$exist['data']['file_certificate1']);
+                }
+
+                if (!empty($datas['remove_file_certificate2'])) {
+                    $data_post['file_certificate2'] = NULL;
+                    $remove_document = $this->document_remove('certificate2', @$exist['data']['file_certificate2']);
+                }
+
+                if (!empty($datas['remove_file_certificate3'])) {
+                    $data_post['file_certificate3'] = NULL;
+                    $remove_document = $this->document_remove('certificate3', @$exist['data']['file_certificate3']);
+                }
+
+                if (!empty($datas['remove_file_certificate4'])) {
+                    $data_post['file_certificate4'] = NULL;
+                    $remove_document = $this->document_remove('certificate4', @$exist['data']['file_certificate4']);
+                }
+
+                /* ===================================================================== */
 
                 // Unilink university and course if empty value
                 if (empty($datas['university_id'])) {

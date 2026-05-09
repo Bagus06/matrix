@@ -1,7 +1,5 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed');
 
-require('./vendor/autoload.php');
-
 use PhpOffice\PhpSpreadsheet\Helper\Sample;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -10,7 +8,7 @@ class Leads extends CI_Controller
 {
     protected $module = 'leads';
     protected $module_alias = 'LDS';
-    protected $default_column_order = array(null, 'enquiry_number', 'full_name', 'phone', 'email', 'university_name', 'course_name', 'assigned_to_name', 'follow_up_date', 'source_code', 'status', 'note');
+    protected $default_column_order = array(null, 'enquiry_number', 'full_name', 'phone', 'email', 'assigned_to_name', 'source_code', 'status', 'updated_at', 'follow_up_date');
     protected $default_order = [
         "column" => "enquiry_number",
         "order" => "ASC"
@@ -45,6 +43,66 @@ class Leads extends CI_Controller
         $output = $this->leads_model->query_builder($data_get);
 
         sys_error_logs($output);
+        echo json_encode($output);
+    }
+
+    public function followup()
+    {
+        $this->load->view('index');
+    }
+
+    public function followup_count()
+    {
+        $output = [
+            'status' => FALSE,
+            'code' => null,
+            'replace_code_value' => null,
+            'redirectUrl' => null,
+            'debug' => [
+                'file' => __FILE__,
+                'line' => __LINE__,
+                'hint' => ''
+            ],
+            'data' => null
+        ];
+
+
+        $get_params = [
+            'select' => 'leads.id',
+            'row_status' => 1,
+            'outputtype' => 'data',
+            'order_by' => [
+                'column' => 'leads.id',
+                'order' => 'ASC'
+            ],
+            'limit' => [
+                'length' => -1,
+                'start' => 0
+            ],
+            'bypass' => false,
+            'whereclause' => "leads.status = 'PENDING' AND follow_up_date < '" . date('Y-m-d') . "'"
+        ];
+
+        if (user_group_check('GR_MKTST', get_user()['id']) && (strtoupper(get_user()['username']) !== 'DEVELOPER')) {
+            $get_params['whereclause'] .= ' AND assigned_to = ' . get_user()['id'];
+        }
+
+        $leads_data = $this->leads_model->leads(0, $get_params, 'GET');
+
+        if ($leads_data['status'] === true) {
+
+            $output = [
+                'status' => TRUE,
+                'code' => null,
+                'replace_code_value' => null,
+                'redirectUrl' => null,
+                'debug' => null,
+                'data' => $leads_data['data']
+            ];
+        }
+
+        sys_error_logs($leads_data);
+
         echo json_encode($output);
     }
 
@@ -136,7 +194,8 @@ class Leads extends CI_Controller
                 'start' => @$data_get['start']
             ],
             'bypass' => false,
-            'whereclause' => @$data_get['whereclause']
+            'whereclause' => @$data_get['whereclause'],
+            'real_page' => $data_get['real_page']
         ];
         $datas = $this->leads_model->leads(0, $get_params, 'GET');
 
@@ -205,13 +264,11 @@ class Leads extends CI_Controller
                 $row[] = $value['full_name'];
                 $row[] = $value['phone'];
                 $row[] = $value['email'];
-                $row[] = $value['university_name'] . ((!empty($value['short_name'])) ? ' ( ' . $value['short_name'] . ' )' : '');
-                $row[] = $value['course_name'] . ((!empty($value['course_code'])) ? ' ( ' . $value['course_code'] . ' )' : '');
                 $row[] = $value['assigned_to_name'];
-                $row[] = date('d F Y', strtotime($value['follow_up_date']));
                 $row[] = $value['source_code'];
                 $row[] = $value['status'];
-                $row[] = $value['note'];
+                $row[] = date('d F Y', strtotime($value['updated_at']));
+                $row[] = date('d F Y', strtotime($value['follow_up_date']));
                 $row[] = $action;
                 $tb_data[] = $row;
             }
@@ -250,6 +307,7 @@ class Leads extends CI_Controller
                 'source_code' => @$datas['source_code'],
                 'tax_percent' => @$datas['tax_percent'],
                 'advance_percent' => @$datas['advance_percent'],
+                'additional_certificate_fee' => @$datas['additional_certificate_fee'],
             ]);
             if (!empty($fees['data'])) {
                 $datas['final_fees'] = $fees['data']['final_amount'];
@@ -303,9 +361,11 @@ class Leads extends CI_Controller
                 'source_code' => @$datas['source_code'],
                 'tax_percent' => @$datas['tax_percent'],
                 'advance_percent' => @$datas['advance_percent'],
+                'additional_certificate_fee' => @$datas['additional_certificate_fee'],
             ]);
             if (!empty($fees['data'])) {
                 $datas['total_amount'] = $fees['data']['total_amount'];
+                $datas['additional_certificate_fee'] = $datas['additional_certificate_fee'];
                 $datas['discount_percent'] = @$fees['data']['discount_percent'];
                 $datas['aditional_discount_percent'] = @$fees['data']['aditional_discount_percent'];
                 $datas['total_discount_percent'] = @$fees['data']['total_discount_percent'];
@@ -314,8 +374,9 @@ class Leads extends CI_Controller
                 $datas['advance_percent'] = @$datas['advance_percent'];
                 $datas['advance_amount'] = $fees['data']['advance_amount'];
                 $datas['remaining_balance'] = $fees['data']['remaining_balance'];
-                $datas['final_payment'] = number_format((float) preg_match('/^\d+(\.\d{1,2})?$/', $amount = preg_replace('/[^0-9.]/', '', $fees['data']['final_payment'])) ? $amount : 0, 2);
+                $datas['final_payment'] = (float) preg_match('/^\d+(\.\d{1,2})?$/', $amount = preg_replace('/[^0-9.]/', '', $fees['data']['final_payment'])) ? $amount : 0;
             }
+
 
             if (!empty($detailed_payment['data']['id'])) {
                 $student = $this->payments_model->create_and_edit($detailed_payment['data']['id'], $datas);
@@ -362,9 +423,11 @@ class Leads extends CI_Controller
                 'source_code' => @$datas['source_code'],
                 'tax_percent' => @$datas['tax_percent'],
                 'advance_percent' => @$datas['advance_percent'],
+                'additional_certificate_fee' => @$datas['additional_certificate_fee'],
             ]);
+
             if (!empty($fees['data'])) {
-                $datas['amount'] = number_format($fees['data']['advance_amount'] - ($fees['data']['advance_amount'] * (number_format((float) @$datas['tax_percent'], 2) / 100)), 2);
+                $datas['amount'] = $fees['data']['advance_amount'] - ($fees['data']['advance_amount'] * ((float) @$datas['tax_percent'] / 100));
                 $datas['tax_percent'] = @$datas['tax_percent'];
                 $datas['final_amount'] = $fees['data']['advance_amount'];
             }
@@ -517,15 +580,16 @@ class Leads extends CI_Controller
                     $toastr[] = $student;
 
                     if ($student['status']) {
-                        $invoices = $this->create_or_edit_invoices($input_post);
-                        $toastr[] = $invoices;
+                        $payments = $this->create_or_edit_payments($input_post);
+                        $toastr[] = $payments;
 
-                        if ($invoices['status']) {
-                            $payments = $this->create_or_edit_payments($input_post);
-                            $toastr[] = $payments;
+                        if ($payments['status']) {
+                            $invoices = $this->create_or_edit_invoices($input_post);
+                            $toastr[] = $invoices;
                         }
                     }
                 }
+
                 // Set enquiry booking number
                 update_booked_number(1, $input_post['enquiry_number']);
             } elseif (!empty($create)) {
@@ -569,7 +633,7 @@ class Leads extends CI_Controller
         } else {
             $utilitys['data']['follow_up_date'] = date('Y-m-d');
             $utilitys['data']['assigned_to'] = get_user()['id'];
-            $utilitys['data']['enquiry_number'] = last_booked_number('ENQ-' . date('Y') . '-', 5);
+            $utilitys['data']['enquiry_number'] = last_booked_number('ENQ-' . date('ymd') . '-', 3);
             create_booked_number($utilitys['data']['enquiry_number']);
         }
 
@@ -689,17 +753,6 @@ class Leads extends CI_Controller
                     if ($payments['status']) {
                         $invoices = $this->create_or_edit_invoices($input_post);
                         $toastr[] = $invoices;
-
-                        if ($invoices['status']) {
-                            $detailed_payment = $this->payments_model->detailed(0, 'student_number = ' . $this->db->escape($input_post['student_number']));
-
-                            if (!empty($detailed_payment['data'])) {
-                                $detailed_payment['data']['invoice_number'] = $input_post['invoice_number'];
-
-                                $update_payment = $this->create_or_edit_payments($detailed_payment['data']);
-                                $toastr[] = $update_payment;
-                            }
-                        }
                     }
                 }
             }

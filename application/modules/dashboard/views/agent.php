@@ -396,7 +396,7 @@
                         </tr>
                         <tr>
                             <td>
-                                <label class="pb-2" id="lbl-assigned_to">Assigned Agent <label class="text-danger mb-0">*</label></label>
+                                <label class="pb-2" id="lbl-assigned_to">Assigned Counselor <label class="text-danger mb-0">*</label></label>
                             </td>
                             <td>
                                 <div class="form-group">

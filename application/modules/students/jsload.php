@@ -10,6 +10,7 @@ switch ($this->uri->rsegments[2]) {
 
     case 'edit':
         // echo '<script src="' . $base_directory . '{js file name}';
+        echo '<script src="' . $base_directory . 'upload.js"></script>';
         echo '<script src="' . $base_directory . 'invoices.js"></script>';
         echo '<script src="' . $base_directory . 'receipts.js"></script>';
         echo '<script src="' . $base_directory . 'courses.js"></script>';

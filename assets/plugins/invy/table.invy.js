@@ -299,6 +299,7 @@
                         data: {
                             whereclause: (((switchPageQuery !== undefined) && (switchPageQuery !== '')) ? switchPageQuery : wcQuery),
                             page: ((switchPageQuery !== '') ? 'inbox' : 'main'),
+                            real_page: jsURI[2],
                             row_status: jsURI[2] == 'recycle' ? 0 : 1,
                         }
                     },

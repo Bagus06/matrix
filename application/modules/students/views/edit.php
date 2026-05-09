@@ -1,11 +1,11 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
-<div class="col-12 row pr-0">
-    <div class="col-12 text-center">
-        <span class="text-primary text-lg font-weight-bold">DETAILED STUDENT INFORMATION</span>
-        <hr>
-    </div>
-    <div class="col-12 col-md-12 col-xl-7">
-        <form method="post" action="" enctype="multipart/form-data">
+<form method="post" action="" enctype="multipart/form-data">
+    <div class="col-12 row pr-0">
+        <div class="col-12 text-center">
+            <span class="text-primary text-lg font-weight-bold">DETAILED STUDENT INFORMATION</span>
+            <hr>
+        </div>
+        <div class="col-12 col-md-12 col-xl-7">
             <div class="card">
                 <div class="card-body">
                     <div class="col-12 pb-3">
@@ -17,15 +17,15 @@
                             <?php
                             if (!empty($utilitys['data'])) {
 
-                                $profile = '.assets/img/profile/' .  @$utilitys['data']['photo'];
+                                $profile = FCPATH . 'uploads/photo/' .  @$utilitys['data']['file_photo'];
 
                                 if (file_exists($profile)) {
-                                    $profile = @$utilitys['data']['photo'];
+                                    $profile = base_url() . '/uploads/photo/' .  @$utilitys['data']['file_photo'];
                                 } else {
-                                    $profile = 'sample.png';
+                                    $profile = base_url() . 'assets/img/profile/sample.png';
                                 }
                             ?>
-                                <img src="<?= base_url() ?>assets/img/profile/<?= @$profile; ?>">
+                                <img src="<?= $profile; ?>">
                             <?php
                             } else {
                             ?>
@@ -54,8 +54,13 @@
                         <strong>Document</strong>
                     </div>
                     <div class="col-12">
-                        <button type="button" class="btn btn-sm btn-outline-primary pr-2" id="btnUploadAadhaar"><i class="fa-solid fa-address-card"></i> Aadhaar</button>
-                        <button type="button" class="btn btn-sm btn-outline-primary pr-2" id="btnUploadPhoto"><i class="fa-solid fa-image-portrait"></i> Photo</button>
+                        <button type="button" class="btn btn-sm btn-outline-primary pr-2 btnOpenUploadModal" data-inputname="file_aadhaar" data-modaltitle="Upload Aadhar" data-accept="image,pdf" data-fileurl="<?= base_url() . 'uploads/aadhaar/' . @$utilitys['data']['file_aadhaar'] . '?v=' . time() ?>" data-filetype="<?= pathinfo(FCPATH . 'uploads/aadhaar/' . @$utilitys['data']['file_aadhaar'], PATHINFO_EXTENSION) ?>"><i class="fa-solid fa-address-card"></i> Aadhaar</button>
+                        <input type="file" name="file_aadhaar" hidden>
+                        <input type="hidden" name="remove_file_aadhaar" value="0">
+
+                        <button type="button" class="btn btn-sm btn-outline-primary pr-2 btnOpenUploadModal" data-inputname="file_photo" data-modaltitle="Upload Photo" data-accept="image" data-fileurl="<?= base_url() . 'uploads/photo/' . @$utilitys['data']['file_photo'] . '?v=' . time() ?>" data-filetype="<?= pathinfo(FCPATH . 'uploads/photo/' . @$utilitys['data']['file_photo'], PATHINFO_EXTENSION) ?>"><i class="fa-solid fa-image-portrait"></i> Photo</button>
+                        <input type="file" name="file_photo" hidden>
+                        <input type="hidden" name="remove_file_photo" value="0">
                     </div>
                 </div>
             </div>
@@ -152,7 +157,7 @@
                     </div>
                     <div class="form-group">
                         <label class="pb-0 mb-0" id="lbl-student_number">Student No. <label class="text-danger">*</label></label>
-                        <input type="text" class="form-control bg-transparant w-100" name="student_number" value="<?= @@$utilitys['data']['student_number']; ?>" readonly required>
+                        <input type="text" class="form-control bg-transparant w-100" name="student_number" value="<?= @$utilitys['data']['student_number']; ?>" readonly required>
                         <small class="text-danger pl-3" id="err-student_number" style="display: none;"></small>
                     </div>
                     <div class="form-group">
@@ -182,6 +187,16 @@
                         <small class="text-danger pl-3" id="err-course_id" style="display: none;"></small>
                     </div>
                     <div class="form-group">
+                        <label class="mb-0" id="lbl-additional_certificate">Additional certificate or attestation</label>
+                        <textarea type="text" class="form-control bg-transparent" rows="2" name="additional_certificate" value="<?= @$utilitys['data']['additional_certificate'] ?>"><?= @$utilitys['data']['additional_certificate'] ?></textarea>
+                        <small class="text-danger pl-3" id="err-additional_certificate" style="display: none;"></small>
+                    </div>
+                    <div class="form-group">
+                        <label id="lbl-additional_certificate_fee">Additional certificate or attestation fee</label>
+                        <input type="number" class="form-control bg-transparant" name="additional_certificate_fee" placeholder="Enter amount (INR)" inputmode="decimal" autocomplete="off" step="0.01" min="0" title="Enter amount in Indian Rupees (numbers only, up to 2 decimals)" value="<?= @$utilitys['data']['additional_certificate_fee'] ?>">
+                        <small class="text-danger pl-3" id="err-additional_certificate_fee" style="display: none;"></small>
+                    </div>
+                    <div class="form-group">
                         <label class="pb-0 mb-0" id="lbl-final_fees">Fees <label class="text-danger">*</label></label>
                         <input type="text" class="form-control bg-transparant w-100" name="final_fees" value="<?= @$utilitys['data']['final_fees']; ?>" readonly required>
                         <small class="text-danger pl-3" id="err-final_fees" style="display: none;"></small>
@@ -190,212 +205,219 @@
                         <strong>Document</strong>
                     </div>
                     <div class="col-12 pl-2 pr-2">
-                        <button type="button" class="btn btn-sm btn-outline-primary pr-2" id="btnUploadC1"><i class="fa-solid fa-cloud-arrow-up"></i> Certificate 1</button>
-                        <button type="button" class="btn btn-sm btn-outline-primary pr-2" id="btnUploadC2"><i class="fa-solid fa-cloud-arrow-up"></i> Certificate 2</button>
-                        <button type="button" class="btn btn-sm btn-outline-primary pr-2" id="btnUploadC3"><i class="fa-solid fa-cloud-arrow-up"></i> Certificate 3</button>
-                        <button type="button" class="btn btn-sm btn-outline-primary pr-2" id="btnUploadC4"><i class="fa-solid fa-cloud-arrow-up"></i> Certificate 4</button>
+                        <button type="button" class="btn btn-sm btn-outline-primary pr-2 btnOpenUploadModal" data-inputname="file_certificate1" data-modaltitle="Upload Certificate 1" data-accept="image,pdf" data-fileurl="<?= base_url() . 'uploads/certificate1/' . @$utilitys['data']['file_certificate1'] . '?v=' . time() ?>" data-filetype="<?= pathinfo(FCPATH . 'uploads/certificate1/' . @$utilitys['data']['file_certificate1'], PATHINFO_EXTENSION) ?>"><i class="fa-solid fa-address-card"></i> Certificate 1</button>
+                        <input type="file" name="file_certificate1" hidden>
+                        <input type="hidden" name="remove_file_certificate1" value="0">
+
+                        <button type="button" class="btn btn-sm btn-outline-primary pr-2 btnOpenUploadModal" data-inputname="file_certificate2" data-modaltitle="Upload Certificate 2" data-accept="image,pdf" data-fileurl="<?= base_url() . 'uploads/certificate2/' . @$utilitys['data']['file_certificate2'] . '?v=' . time() ?>" data-filetype="<?= pathinfo(FCPATH . 'uploads/certificate2/' . @$utilitys['data']['file_certificate2'], PATHINFO_EXTENSION) ?>"><i class="fa-solid fa-address-card"></i> Certificate 2</button>
+                        <input type="file" name="file_certificate2" hidden>
+                        <input type="hidden" name="remove_file_certificate2" value="0">
+
+                        <button type="button" class="btn btn-sm btn-outline-primary pr-2 btnOpenUploadModal" data-inputname="file_certificate3" data-modaltitle="Upload Certificate 3" data-accept="image,pdf" data-fileurl="<?= base_url() . 'uploads/certificate3/' . @$utilitys['data']['file_certificate3'] . '?v=' . time() ?>" data-filetype="<?= pathinfo(FCPATH . 'uploads/certificate3/' . @$utilitys['data']['file_certificate3'], PATHINFO_EXTENSION) ?>"><i class="fa-solid fa-address-card"></i> Certificate 3</button>
+                        <input type="file" name="file_certificate3" hidden>
+                        <input type="hidden" name="remove_file_certificate3" value="0">
+
+                        <button type="button" class="btn btn-sm btn-outline-primary pr-2 btnOpenUploadModal" data-inputname="file_certificate4" data-modaltitle="Upload Certificate 4" data-accept="image,pdf" data-fileurl="<?= base_url() . 'uploads/certificate4/' . @$utilitys['data']['file_certificate4'] . '?v=' . time() ?>" data-filetype="<?= pathinfo(FCPATH . 'uploads/certificate4/' . @$utilitys['data']['file_certificate4'], PATHINFO_EXTENSION) ?>"><i class="fa-solid fa-address-card"></i> Certificate 4</button>
+                        <input type="file" name="file_certificate4" hidden>
+                        <input type="hidden" name="remove_file_certificate4" value="0">
                     </div>
                 </div>
             </div>
-            <button type="submit" id="<?= ((empty($internal['create_form'])) ? @$internal['edit_form'] : @$internal['create_form']) ?>" style="display: none;"></button>
-        </form>
-        <div class="card">
-            <div class="card-body">
-                <div class="col-12 pb-3">
-                    <span class="text-lg font-weight-bold"><i class="fa-solid fa-user-plus"></i> LEADS INFORMATION</span>
-                </div>
-                <div class="form-group col-12 row">
-                    <label class="pb-2" id="lbl-source_code">Leads Source</label>
-                    <select class="form-control bg-transparant w-100" name="source_code" disabled required>
-                        <option value="">--SELECT--</option>
-                        <?php if (!empty($utilitys['leads_sources']['data']['data'])) : ?>
-                            <?php foreach ($utilitys['leads_sources']['data']['data'] as $key => $value) : ?>
-                                <?php
-                                $selected = '';
-                                $source_name = '';
-                                if (@$utilitys['data_leads']['data']['source_code'] == $value['source_code']) {
-                                    $selected = 'selected';
-                                    $source_name = $value['source_name'];
-                                }
-                                ?>
-                                <option value="<?= $value['source_code']; ?>" <?= $selected ?>><?= $value['source_code'] . (($value['source_name'] === 'B2B') ? ' ( Company Name : ' . $value['b2b_company_name'] . ' )' : (($value['source_name'] === 'REFERANCE') ? ' ( Referance Name : ' . $value['ref_name'] . ' )' : '')) ?></option>
-                            <?php endforeach; ?>
-                        <?php endif; ?>
-                    </select>
-                    <small class="text-danger pl-3" id="err-source_code" style="display: none;"></small>
-                </div>
-                <div class="form-group col-12 row">
-                    <textarea type="text" class="form-control bg-transparant w-100" rows="2" name="source_information" value="<?= @$utilitys['data_leads']['data']['source_information'] ?>" disabled><?= @$utilitys['data_leads']['data']['source_information'] ?></textarea>
-                    <small class="text-danger pl-3" id="err-source_information" style="display: none;"></small>
-                </div>
-                <div class="form-group col-12 row">
-                    <label class="pb-2" id="lbl-priority">Priority</label>
-                    <select class="form-control bg-transparant w-100" name="priority" <?= ((@$utilitys['data_leads']['data']['status'] === 'YES') ? 'readonly' : '') ?> disabled required>
-                        <option value=""><span class="text-muted text-italic">Select an Option</span></option>
-                        <?php if (!empty($utilitys['priority'])) : ?>
-                            <?php foreach ($utilitys['priority'] as $key => $value) : ?>
-                                <?php
-                                $selected = '';
-                                if (@$utilitys['data_leads']['data']['priority'] == $value) {
-                                    $selected = 'selected';
-                                }
-                                ?>
-                                <option value="<?= $value; ?>" <?= $selected ?>><?= $value ?></option>
-                            <?php endforeach; ?>
-                        <?php endif; ?>
-                    </select>
-                    <small class="text-danger pl-3" id="err-priority" style="display: none;"></small>
-                </div>
-                <div class="form-group col-12 row">
-                    <label id="lbl-follow_up_date">Follow up Date</label>
-                    <input type="date" class="form-control bg-transparant" name="follow_up_date" value="<?= @$utilitys['data_leads']['data']['follow_up_date'] ?>" disabled required>
-                    <small class="text-danger pl-3" id="err-follow_up_date" style="display: none;"></small>
-                </div>
-                <div class="form-group col-12 row">
-                    <label class="pb-2" id="lbl-status">Status</label>
-                    <select class="form-control bg-transparant w-100" name="status" <?= ((@$utilitys['data_leads']['data']['status'] === 'YES') ? 'readonly' : '') ?> disabled required>
-                        <option value=""><span class="text-muted text-light text-italic" style="color: #999;">Select an Option</span></option>
-                        <?php if (!empty($utilitys['status'])) : ?>
-                            <?php foreach ($utilitys['status'] as $key => $value) : ?>
-                                <?php
-                                $selected = '';
-                                if (@$utilitys['data_leads']['data']['status'] == $value) {
-                                    $selected = 'selected';
-                                }
-                                ?>
-                                <option value="<?= $value; ?>" <?= $selected ?>><?= $value ?></option>
-                            <?php endforeach; ?>
-                        <?php endif; ?>
-                    </select>
-                    <small class="text-danger pl-3" id="err-status" style="display: none;"></small>
-                </div>
-                <div class="form-group col-12 row">
-                    <label id="lbl-note">Note</label>
-                    <textarea type="text" class="form-control bg-transparant" name="note" value="<?= @$utilitys['data_leads']['data']['note'] ?>" disabled><?= ((empty($utilitys['data_leads']['data']['note'])) ? 'Empty' : $utilitys['data_leads']['data']['note']) ?></textarea>
-                    <small class="text-danger pl-3" id="err-note" style="display: none;"></small>
-                </div>
-                <div class="form-group col-12 row">
-                    <label class="pb-2" id="lbl-assigned_to">Assigned Agent</label>
-                    <select class="form-control bg-transparant w-100" name="assigned_to" <?= ((!empty(@$utilitys['data_leads']['data']['assigned_to'])) ? 'readonly' : ''); ?> disabled required>
-                        <option value=""><span class="text-muted text-light text-italic">Select an Option</span></option>
-                        <?php if (!empty($utilitys['assigned']['data']['data'])) : ?>
-                            <?php foreach ($utilitys['assigned']['data']['data'] as $key => $value) : ?>
-                                <?php
-                                $selected = '';
-                                if (@$utilitys['data_leads']['data']['assigned_to'] == $value['user_id']) {
-                                    $selected = 'selected';
-                                }
-                                ?>
-                                <option value="<?= $value['user_id']; ?>" <?= $selected ?>><?= $value['name'] ?></option>
-                            <?php endforeach; ?>
-                        <?php endif; ?>
-                    </select>
-                    <small class="text-danger pl-3" id="err-assigned_to" style="display: none;"></small>
+            <div class="card">
+                <div class="card-body">
+                    <div class="col-12 pb-3">
+                        <span class="text-lg font-weight-bold"><i class="fa-solid fa-user-plus"></i> LEADS INFORMATION</span>
+                    </div>
+                    <div class="form-group">
+                        <label class="mb-0" id="lbl-enquiry_number">Enquiry No. <label class="text-danger">*</label></label>
+                        <input type="text" class="form-control bg-transparant" name="enquiry_number" value="<?= @$utilitys['data']['enquiry_number'] ?>" readonly required>
+                        <small class="text-danger pl-3" id="err-enquiry_number" style="display: none;"></small>
+                    </div>
+                    <div class="form-group">
+                        <label class="pb-2" id="lbl-source_code">Leads Source</label>
+                        <select class="form-control bg-transparant w-100" name="source_code" disabled required>
+                            <option value="">--SELECT--</option>
+                            <?php if (!empty($utilitys['leads_sources']['data']['data'])) : ?>
+                                <?php foreach ($utilitys['leads_sources']['data']['data'] as $key => $value) : ?>
+                                    <?php
+                                    $selected = '';
+                                    $source_name = '';
+                                    if (@$utilitys['data_leads']['data']['source_code'] == $value['source_code']) {
+                                        $selected = 'selected';
+                                        $source_name = $value['source_name'];
+                                    }
+                                    ?>
+                                    <option value="<?= $value['source_code']; ?>" <?= $selected ?>><?= $value['source_code'] . (($value['source_name'] === 'B2B') ? ' ( Company Name : ' . $value['b2b_company_name'] . ' )' : (($value['source_name'] === 'REFERANCE') ? ' ( Referance Name : ' . $value['ref_name'] . ' )' : '')) ?></option>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </select>
+                        <small class="text-danger pl-3" id="err-source_code" style="display: none;"></small>
+                    </div>
+                    <div class="form-group">
+                        <textarea type="text" class="form-control bg-transparant w-100" rows="2" name="source_information" value="<?= @$utilitys['data_leads']['data']['source_information'] ?>" disabled><?= @$utilitys['data_leads']['data']['source_information'] ?></textarea>
+                        <small class="text-danger pl-3" id="err-source_information" style="display: none;"></small>
+                    </div>
+                    <div class="form-group">
+                        <label class="pb-2" id="lbl-priority">Priority</label>
+                        <select class="form-control bg-transparant w-100" name="priority" <?= ((@$utilitys['data_leads']['data']['status'] === 'YES') ? 'readonly' : '') ?> disabled required>
+                            <option value=""><span class="text-muted text-italic">Select an Option</span></option>
+                            <?php if (!empty($utilitys['priority'])) : ?>
+                                <?php foreach ($utilitys['priority'] as $key => $value) : ?>
+                                    <?php
+                                    $selected = '';
+                                    if (@$utilitys['data_leads']['data']['priority'] == $value) {
+                                        $selected = 'selected';
+                                    }
+                                    ?>
+                                    <option value="<?= $value; ?>" <?= $selected ?>><?= $value ?></option>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </select>
+                        <small class="text-danger pl-3" id="err-priority" style="display: none;"></small>
+                    </div>
+                    <div class="form-group">
+                        <label id="lbl-follow_up_date">Follow up Date</label>
+                        <input type="date" class="form-control bg-transparant" name="follow_up_date" value="<?= @$utilitys['data_leads']['data']['follow_up_date'] ?>" disabled required>
+                        <small class="text-danger pl-3" id="err-follow_up_date" style="display: none;"></small>
+                    </div>
+                    <div class="form-group">
+                        <label class="pb-2" id="lbl-status">Status</label>
+                        <select class="form-control bg-transparant w-100" name="status" <?= ((@$utilitys['data_leads']['data']['status'] === 'YES') ? 'readonly' : '') ?> disabled required>
+                            <option value=""><span class="text-muted text-light text-italic" style="color: #999;">Select an Option</span></option>
+                            <?php if (!empty($utilitys['status'])) : ?>
+                                <?php foreach ($utilitys['status'] as $key => $value) : ?>
+                                    <?php
+                                    $selected = '';
+                                    if (@$utilitys['data_leads']['data']['status'] == $value) {
+                                        $selected = 'selected';
+                                    }
+                                    ?>
+                                    <option value="<?= $value; ?>" <?= $selected ?>><?= $value ?></option>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </select>
+                        <small class="text-danger pl-3" id="err-status" style="display: none;"></small>
+                    </div>
+                    <div class="form-group">
+                        <label id="lbl-note">Note</label>
+                        <textarea type="text" class="form-control bg-transparant" name="note" value="<?= @$utilitys['data_leads']['data']['note'] ?>" disabled><?= ((empty($utilitys['data_leads']['data']['note'])) ? 'Empty' : $utilitys['data_leads']['data']['note']) ?></textarea>
+                        <small class="text-danger pl-3" id="err-note" style="display: none;"></small>
+                    </div>
+                    <div class="form-group">
+                        <label class="pb-2" id="lbl-assigned_to">Assigned Counselor</label>
+                        <select class="form-control bg-transparant w-100" name="assigned_to" <?= ((!empty(@$utilitys['data_leads']['data']['assigned_to'])) ? 'readonly' : ''); ?> disabled required>
+                            <option value=""><span class="text-muted text-light text-italic">Select an Option</span></option>
+                            <?php if (!empty($utilitys['assigned']['data']['data'])) : ?>
+                                <?php foreach ($utilitys['assigned']['data']['data'] as $key => $value) : ?>
+                                    <?php
+                                    $selected = '';
+                                    if (@$utilitys['data_leads']['data']['assigned_to'] == $value['user_id']) {
+                                        $selected = 'selected';
+                                    }
+                                    ?>
+                                    <option value="<?= $value['user_id']; ?>" <?= $selected ?>><?= $value['name'] ?></option>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </select>
+                        <small class="text-danger pl-3" id="err-assigned_to" style="display: none;"></small>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-    <div class="col-12 col-md-12 col-xl-5">
-        <div class="card">
-            <div class="card-body">
-                <div class="col-12 pb-3">
-                    <span class="text-lg font-weight-bold"><i class="fa-solid fa-wallet"></i> PAYMENT INFORMATION</span>
-                </div>
-                <div class="form-group col-12 row">
-                    <label id="lbl-status">Status</label>
-                    <input type="text" class="form-control bg-transparant" name="status" value="<?= @$utilitys['data_payment']['data']['status'] ?>" readonly>
-                    <small class="text-danger pl-3" id="err-status" style="display: none;"></small>
-                </div>
-                <div class="form-group col-12 row">
-                    <label id="lbl-total_amount">Total Amount</label>
-                    <input type="number" class="form-control bg-transparant" name="total_amount" inputmode="decimal" step="0.01" min="0" value="<?= @$utilitys['data_payment']['data']['total_amount'] ?>" readonly>
-                    <small class="text-danger pl-3" id="err-total_amount" style="display: none;"></small>
-                </div>
-                <div class="form-group col-12 row">
-                    <label id="lbl-discount_percent">Discount</label>
-                    <input type="number" class="form-control bg-transparant" name="discount_percent" inputmode="decimal" step="0.01" min="0" value="<?= @$utilitys['data_payment']['data']['discount_percent'] ?>" readonly>
-                    <small class="text-danger pl-3" id="err-discount_percent" style="display: none;"></small>
-                </div>
-                <div class="form-group col-12 row">
-                    <label id="lbl-aditional_discount_percent">Aditional Discount</label>
-                    <input type="number" class="form-control bg-transparant" name="aditional_discount_percent" inputmode="decimal" step="0.01" min="0" value="<?= @$utilitys['data_payment']['data']['aditional_discount_percent'] ?>" <?= ((user_group_check('GR_ADMIN', get_user()['id']) && (@$utilitys['data_invoice']['data']['approval_status'] != 'APPROVED')) ? '' : 'readonly'); ?>>
-                    <small class="text-danger pl-3" id="err-aditional_discount_percent" style="display: none;"></small>
-                </div>
-                <div class="form-group col-12 row">
-                    <label id="lbl-total_discount_percent">Total Discount</label>
-                    <input type="number" class="form-control bg-transparant" name="total_discount_percent" inputmode="decimal" step="0.01" min="0" value="<?= @$utilitys['data_payment']['data']['total_discount_percent'] ?>" readonly>
-                    <small class="text-danger pl-3" id="err-total_discount_percent" style="display: none;"></small>
-                </div>
-                <div class="form-group col-12 row">
-                    <label id="lbl-tax_percent">TAX</label>
-                    <input type="number" class="form-control bg-transparant" name="tax_percent" inputmode="decimal" step="0.01" min="0" value="<?= @$utilitys['data_payment']['data']['tax_percent'] ?>" <?= ((user_group_check('GR_ADMIN', get_user()['id']) && (@$utilitys['data_invoice']['data']['approval_status'] != 'APPROVED')) ? '' : 'readonly'); ?>>
-                    <small class="text-danger pl-3" id="err-tax_percent" style="display: none;"></small>
-                </div>
-                <div class="form-group col-12 row">
-                    <label id="lbl-final_amount">Final Amount</label>
-                    <input type="number" class="form-control bg-transparant" name="final_amount" inputmode="decimal" step="0.01" min="0" value="<?= @$utilitys['data_payment']['data']['final_amount'] ?>" readonly>
-                    <small class="text-danger pl-3" id="err-final_amount" style="display: none;"></small>
-                </div>
-                <div class="form-group col-12 row">
-                    <label id="lbl-remaining_balance">Remaining Balance</label>
-                    <input type="number" class="form-control bg-transparant" name="remaining_balance" inputmode="decimal" step="0.01" min="0" value="<?= @$utilitys['data_payment']['data']['remaining_balance'] ?>" readonly>
-                    <small class="text-danger pl-3" id="err-remaining_balance" style="display: none;"></small>
-                </div>
-                <hr>
-                <div class="col-12 pb-3">
-                    <span class="text-sm text-primary font-weight-bold">ADVANCE</span>
-                </div>
-                <div class="form-group col-12 row">
-                    <label id="lbl-invoice_number">Invoice Number</label>
-                    <input type="text" class="form-control bg-transparant" name="invoice_number" value="<?= @$utilitys['data_payment']['data']['invoice_number'] ?>" readonly>
-                    <small class="text-danger pl-3" id="err-invoice_number" style="display: none;"></small>
-                </div>
-                <div class="form-group col-12 row">
-                    <label id="lbl-advance_percent">Advance Percent</label>
-                    <input type="number" class="form-control bg-transparant" name="advance_percent" inputmode="decimal" step="0.01" min="0" value="<?= @$utilitys['data_payment']['data']['advance_percent'] ?>" <?= ((user_group_check('GR_ADMIN', get_user()['id']) && (@$utilitys['data_invoice']['data']['approval_status'] != 'APPROVED')) ? '' : 'readonly'); ?>>
-                    <small class="text-danger pl-3" id="err-advance_percent" style="display: none;"></small>
-                </div>
-                <div class="form-group col-12 row">
-                    <label id="lbl-advance_amount">Advance Amount</label>
-                    <input type="number" class="form-control bg-transparant" name="advance_amount" inputmode="decimal" step="0.01" min="0" value="<?= @$utilitys['data_payment']['data']['advance_amount'] ?>" readonly>
-                    <small class="text-danger pl-3" id="err-advance_amount" style="display: none;"></small>
-                </div>
-                <div class="form-group col-12 row">
-                    <label id="lbl-advance_date">Advance Date</label>
-                    <input type="date" class="form-control bg-transparant" name="advance_date" value="<?= @$utilitys['data_payment']['data']['advance_date'] ?>" readonly>
-                    <small class="text-danger pl-3" id="err-advance_date" style="display: none;"></small>
-                </div>
-                <div class="col-12 pl-3 pr-3 row">
-                    <div class="col-6 p-0">
-                        <button type="button" class="btn btn-outline-primary w-100" data-invoicestatus="<?= @$utilitys['data_invoice']['data']['approval_status']; ?>" id="btn-advence-invoice" <?= (((strtoupper(@$utilitys['data_invoice']['data']['approval_status']) !== 'APPROVED') && !user_group_check('GR_ADMIN', get_user()['id'])) ? 'disabled' : ''); ?>><?= ((strtoupper(@$utilitys['data_invoice']['data']['approval_status']) === 'APPROVED') ? 'Download Invoice' : 'Release Invoice'); ?></button>
+        <div class="col-12 col-md-12 col-xl-5">
+            <div class="card" id="section-payment-information">
+                <div class="card-body">
+                    <div class="col-12 pb-3">
+                        <span class="text-lg font-weight-bold"><i class="fa-solid fa-wallet"></i> PAYMENT INFORMATION</span>
                     </div>
-                    <div class="col-6 p-0 pl-2">
-                        <button class="btn btn-outline-primary w-100" disabled>Release Receipt</button>
+                    <div class="form-group">
+                        <label id="lbl-status">Status</label>
+                        <input type="text" class="form-control bg-transparant" name="status" value="<?= @$utilitys['data_payment']['data']['status'] ?>" readonly>
+                        <small class="text-danger pl-3" id="err-status" style="display: none;"></small>
                     </div>
-                </div>
-                <hr>
-                <div class="col-12 pb-3">
-                    <span class="text-sm text-primary font-weight-bold">FINAL PAYMENT</span>
-                </div>
-                <div class="form-group col-12 row">
-                    <label id="lbl-due_date">Final Payment Due Date</label>
-                    <input type="date" class="form-control bg-transparant" name="due_date" value="<?= @$utilitys['data_payment']['data']['due_date'] ?>" <?= ((user_group_check('GR_ADMIN', get_user()['id']) && (@$utilitys['data_invoice']['data']['approval_status'] != 'APPROVED')) ? '' : 'readonly'); ?>>
-                    <small class="text-danger pl-3" id="err-due_date" style="display: none;"></small>
-                </div>
-                <div class="form-group col-12 row">
-                    <label id="lbl-final_payment">Final Payment</label>
-                    <input type="number" class="form-control bg-transparant" name="final_payment" inputmode="decimal" step="0.01" min="0" value="<?= @$utilitys['data_payment']['data']['final_payment'] ?>" readonly>
-                    <small class="text-danger pl-3" id="err-final_payment" style="display: none;"></small>
-                </div>
-                <div class="form-group col-12 row">
-                    <label id="lbl-final_payment_date">Final Payment Date</label>
-                    <input type="date" class="form-control bg-transparant" name="final_payment_date" value="<?= @$utilitys['data_payment']['data']['final_payment_date'] ?>" readonly>
-                    <small class="text-danger pl-3" id="err-final_payment_date" style="display: none;"></small>
-                </div>
-                <div class="col-12 pl-3 pr-3 row">
-                    <button class="btn btn-outline-primary w-100" id="btn-receipt">Release Receipt</button>
+                    <div class="form-group">
+                        <label id="lbl-total_amount">Total Amount</label>
+                        <input type="number" class="form-control bg-transparant" name="total_amount" inputmode="decimal" step="0.01" min="0" value="<?= @$utilitys['data_payment']['data']['total_amount'] ?>" readonly>
+                        <small class="text-danger pl-3" id="err-total_amount" style="display: none;"></small>
+                    </div>
+                    <div class="form-group">
+                        <label id="lbl-discount_percent">Discount</label>
+                        <input type="number" class="form-control bg-transparant" name="discount_percent" inputmode="decimal" step="0.01" min="0" value="<?= @$utilitys['data_payment']['data']['discount_percent'] ?>" readonly>
+                        <small class="text-danger pl-3" id="err-discount_percent" style="display: none;"></small>
+                    </div>
+                    <div class="form-group">
+                        <label id="lbl-aditional_discount_percent">Aditional Discount</label>
+                        <input type="number" class="form-control bg-transparant" name="aditional_discount_percent" inputmode="decimal" step="0.01" min="0" value="<?= @$utilitys['data_payment']['data']['aditional_discount_percent'] ?>" <?= ((user_group_check('GR_ADMIN', get_user()['id']) && (@$utilitys['data_invoice']['data']['approval_status'] != 'APPROVED')) ? '' : 'readonly'); ?>>
+                        <small class="text-danger pl-3" id="err-aditional_discount_percent" style="display: none;"></small>
+                    </div>
+                    <div class="form-group">
+                        <label id="lbl-total_discount_percent">Total Discount</label>
+                        <input type="number" class="form-control bg-transparant" name="total_discount_percent" inputmode="decimal" step="0.01" min="0" value="<?= @$utilitys['data_payment']['data']['total_discount_percent'] ?>" readonly>
+                        <small class="text-danger pl-3" id="err-total_discount_percent" style="display: none;"></small>
+                    </div>
+                    <div class="form-group">
+                        <label id="lbl-tax_percent">TAX</label>
+                        <input type="number" class="form-control bg-transparant" name="tax_percent" inputmode="decimal" step="0.01" min="0" value="<?= @$utilitys['data_payment']['data']['tax_percent'] ?>" <?= ((user_group_check('GR_ADMIN', get_user()['id']) && (@$utilitys['data_invoice']['data']['approval_status'] != 'APPROVED')) ? '' : 'readonly'); ?>>
+                        <small class="text-danger pl-3" id="err-tax_percent" style="display: none;"></small>
+                    </div>
+                    <div class="form-group">
+                        <label id="lbl-final_amount">Final Amount</label>
+                        <input type="number" class="form-control bg-transparant" name="final_amount" inputmode="decimal" step="0.01" min="0" value="<?= @$utilitys['data_payment']['data']['final_amount'] ?>" readonly>
+                        <small class="text-danger pl-3" id="err-final_amount" style="display: none;"></small>
+                    </div>
+                    <div class="form-group">
+                        <label id="lbl-remaining_balance">Remaining Balance</label>
+                        <input type="number" class="form-control bg-transparant" name="remaining_balance" inputmode="decimal" step="0.01" min="0" value="<?= @$utilitys['data_payment']['data']['remaining_balance'] ?>" readonly>
+                        <small class="text-danger pl-3" id="err-remaining_balance" style="display: none;"></small>
+                    </div>
+                    <hr>
+                    <div class="col-12 pb-3">
+                        <span class="text-sm text-primary font-weight-bold">ADVANCE</span>
+                    </div>
+                    <div class="form-group">
+                        <label id="lbl-invoice_number">Invoice Number</label>
+                        <input type="text" class="form-control bg-transparant" name="invoice_number" value="<?= @$utilitys['data_payment']['data']['invoice_number'] ?>" readonly>
+                        <small class="text-danger pl-3" id="err-invoice_number" style="display: none;"></small>
+                    </div>
+                    <div class="form-group">
+                        <label id="lbl-advance_percent">Advance Percent</label>
+                        <input type="number" class="form-control bg-transparant" name="advance_percent" inputmode="decimal" step="0.01" min="0" value="<?= @$utilitys['data_payment']['data']['advance_percent'] ?>" <?= ((user_group_check('GR_ADMIN', get_user()['id']) && (@$utilitys['data_invoice']['data']['approval_status'] != 'APPROVED')) ? '' : 'readonly'); ?>>
+                        <small class="text-danger pl-3" id="err-advance_percent" style="display: none;"></small>
+                    </div>
+                    <div class="form-group">
+                        <label id="lbl-advance_amount">Advance Amount</label>
+                        <input type="number" class="form-control bg-transparant" name="advance_amount" inputmode="decimal" step="0.01" min="0" value="<?= @$utilitys['data_payment']['data']['advance_amount'] ?>" readonly>
+                        <small class="text-danger pl-3" id="err-advance_amount" style="display: none;"></small>
+                    </div>
+                    <div class="form-group">
+                        <label id="lbl-advance_date">Advance Date</label>
+                        <input type="date" class="form-control bg-transparant" name="advance_date" value="<?= @$utilitys['data_payment']['data']['advance_date'] ?>" readonly>
+                        <small class="text-danger pl-3" id="err-advance_date" style="display: none;"></small>
+                    </div>
+                    <hr>
+                    <div class="col-12 pb-3">
+                        <span class="text-sm text-primary font-weight-bold">FINAL PAYMENT</span>
+                    </div>
+                    <div class="form-group">
+                        <label id="lbl-due_date">Final Payment Due Date</label>
+                        <input type="date" class="form-control bg-transparant" name="due_date" value="<?= @$utilitys['data_payment']['data']['due_date'] ?>" <?= ((user_group_check('GR_ADMIN', get_user()['id']) && (@$utilitys['data_invoice']['data']['approval_status'] != 'APPROVED')) ? '' : 'readonly'); ?>>
+                        <small class="text-danger pl-3" id="err-due_date" style="display: none;"></small>
+                    </div>
+                    <div class="form-group">
+                        <label id="lbl-final_payment">Final Payment</label>
+                        <input type="number" class="form-control bg-transparant" name="final_payment" inputmode="decimal" step="0.01" min="0" value="<?= @$utilitys['data_payment']['data']['final_payment'] ?>" readonly>
+                        <small class="text-danger pl-3" id="err-final_payment" style="display: none;"></small>
+                    </div>
+                    <div class="form-group">
+                        <label id="lbl-final_payment_date">Final Payment Date</label>
+                        <input type="date" class="form-control bg-transparant" name="final_payment_date" value="<?= @$utilitys['data_payment']['data']['final_payment_date'] ?>" readonly>
+                        <small class="text-danger pl-3" id="err-final_payment_date" style="display: none;"></small>
+                    </div>
+                    <button type="button" class="btn btn-outline-primary w-100" data-invoicestatus="<?= @$utilitys['data_invoice']['data']['approval_status']; ?>" id="btn-advence-invoice" <?= (((strtoupper(@$utilitys['data_invoice']['data']['approval_status']) !== 'APPROVED') && !user_group_check('GR_ADMIN', get_user()['id'])) ? 'disabled' : ''); ?>><?= ((strtoupper(@$utilitys['data_invoice']['data']['approval_status']) === 'APPROVED') ? 'Download Invoice' : 'Release Invoice'); ?></button>
+                    <button class="btn btn-outline-primary w-100 mt-2" id="btn-receipt">Release Receipt</button>
                 </div>
             </div>
         </div>
+        <button type="submit" id="<?= ((empty($internal['create_form'])) ? @$internal['edit_form'] : @$internal['create_form']) ?>" style="display: none;"></button>
     </div>
-</div>
+</form>

@@ -322,7 +322,7 @@ class University_courses extends CI_Controller
         $id = decryptcst($id);
 
         $utilitys['course_level'] = ['Diploma', 'UG', 'PG', 'Doctorate'];
-        $utilitys['course_type'] = ['Full Time', 'Part Time', 'Distance', 'Online'];
+        $utilitys['course_type'] = ['Online', 'Reguler', 'Speedtrack'];
         $get_params = [
             'select' => 'id, university_name, short_name',
             'row_status' => 1,

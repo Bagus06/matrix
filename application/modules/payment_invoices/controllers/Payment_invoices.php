@@ -275,6 +275,7 @@ class Payment_invoices extends CI_Controller
         exit;
     }
 
+    /*
     public function generate_invoice()
     {
         $output = [
@@ -360,7 +361,6 @@ class Payment_invoices extends CI_Controller
                     'tax_percent' => @$detailed_payment['data']['tax_percent'] . '%',
                     'final_amount' => @$detailed_payment['data']['final_amount'],
                     'discount_percent' => @$detailed_payment['data']['discount_percent'] . '%',
-                    'total_amount' => @$detailed_payment['data']['total_amount'],
                     'advance_percent' => @$detailed_payment['data']['advance_percent'],
                     'advance_amount' => @$detailed_payment['data']['advance_amount'],
                     'due_date' => ((!empty(@$detailed_payment['data']['due_date'])) ? date('F d, Y', strtotime(@$detailed_payment['data']['due_date'])) : '')
@@ -411,6 +411,45 @@ class Payment_invoices extends CI_Controller
 
         sys_error_logs($output);
         echo json_encode($output);
+    }
+    */
+
+    public function generate_invoice($student_number = null)
+    {
+        $utilitys = [];
+        $data_get = @$this->input->get();
+        if (!empty(hex2bin($data_get['student_number']))) {
+            $student_number = hex2bin($data_get['student_number']);
+            $utilitys['student_data'] = $this->students_model->detailed('', "student_number = '" . $student_number . "'");
+            $utilitys['payment'] = $this->payments_model->detailed('', "student_number = '" . $student_number . "'");
+            $utilitys['peyment_invoice'] = $this->payment_invoices_model->detailed('', "invoice_number = '" . @$utilitys['payment']['data']['invoice_number'] . "'");
+
+            $get_params = [
+                'select' => '*',
+                'row_status' => 1,
+                'outputtype' => 'data',
+                'order_by' => [
+                    'column' => 'account_name',
+                    'order' => 'ASC'
+                ],
+                'limit' => [
+                    'length' => -1,
+                    'start' => 0
+                ],
+                'bypass' => true,
+                'whereclause' => ''
+            ];
+            $payment_methods = $this->payment_methods_model->payment_methods('', $get_params, 'GET');
+
+            if (!empty($payment_methods['data']['data'])) {
+                $utilitys['payment_methods'] = [];
+                foreach ($payment_methods['data']['data'] as $key => $value) {
+                    $utilitys['payment_methods'][$value['method_code']] = $value;
+                }
+            }
+        }
+
+        $this->load->view('payment_invoices/generate_invoice', ['utilitys' => $utilitys]);
     }
 
     private function create_or_edit_payments($datas = null)

@@ -3,7 +3,7 @@
         <img src="<?= apps_conf('apps -logo') ?>" alt="Apps Logo" class="brand-image">
         <span class="brand-text font-weight-light"></span>
     </a>
-    <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+    <div class="user-panel mt-4 pb-3 mb-3 d-flex">
         <div class="image">
             <?php
             $profile = '.assets/img/profile/' .  @get_user()['photo'];
