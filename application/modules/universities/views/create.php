@@ -8,8 +8,17 @@
                 <div class="col-md-12 col-md-4 col-xl-4">
                     <div class="form-group">
                         <label id="lbl-university_name">University Name <label class="text-danger mb-0">*</label></label>
-                        <input type="text" class="form-control bg-transparent" minlength="5" maxlength="100" name="university_name" placeholder="University Name" value="<?= @$utilitys['data']['university_name'] ?>" required>
-                        <small class="text-danger pl-3" id="err-university_name" style="display: none;"></small>
+                        <div class="col-12 row p-0 m-0">
+                            <div class="col-8 p-0 m-0">
+                                <input type="text" class="form-control bg-transparent" minlength="4" maxlength="100" name="university_name" placeholder="University Name" value="<?= @$utilitys['data']['university_name'] ?>" required>
+                            </div>
+                            <div class="col-4 pr-0">
+                                <button type="button" class="btn btn-block btn-outline-primary pr-2 btnOpenUploadModal" data-inputname="logo" data-modaltitle="Upload Logo" data-accept="image" data-fileurl="<?= base_url() . 'uploads/universities_logo/' . @$utilitys['data']['logo'] . '?v=' . time() ?>" data-filetype="<?= pathinfo(FCPATH . 'uploads/photo/' . @$utilitys['data']['logo'], PATHINFO_EXTENSION) ?>"><i class="fa-solid fa-building-columns"></i> Logo</button>
+                                <input type="file" name="logo" hidden>
+                                <input type="hidden" name="remove_logo" value="0">
+                            </div>
+                            <small class="text-danger pl-3" id="err-university_name" style="display: none;"></small>
+                        </div>
                     </div>
                     <div class="form-group">
                         <label id="lbl-short_name">University Short Name</label>

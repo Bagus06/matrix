@@ -14,9 +14,9 @@
                                     <?php
                                     if (!empty($utilitys['data'])) {
 
-                                        $profile = '.assets/img/profile/' .  @$utilitys['data']['photo'];
+                                        $profile = FCPATH . 'assets/img/profile/' .  @$utilitys['data']['photo'];
 
-                                        if (file_exists($profile)) {
+                                        if (is_file($profile)) {
                                             $profile = @$utilitys['data']['photo'];
                                         } else {
                                             $profile = 'default_profile.png';

@@ -177,6 +177,10 @@ class Users_model extends CI_model
     {
         $output = '';
 
+        if (strtoupper(get_user()['username']) !== 'DEVELOPER') {
+            $output .= " AND username != 'Developer'";
+        }
+
         return $output;
     }
 

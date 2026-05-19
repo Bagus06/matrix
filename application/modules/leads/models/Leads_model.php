@@ -184,6 +184,10 @@ class Leads_model extends CI_model
 
         if (user_group_check('GR_ADMIN', get_user()['id'])) {
             $params['bypass'] = true;
+
+            if (strtoupper(@$params['real_page']) === 'FOLLOWUP') {
+                $output = " AND leads.status = 'PENDING' AND follow_up_date < '" . date('Y-m-d') . "'";
+            }
         }
 
         if (!$params['bypass']) {
@@ -590,6 +594,21 @@ class Leads_model extends CI_model
         return $output;
     }
 
+    public function religion()
+    {
+        $output = [
+            'Hindu',
+            'Islam',
+            'Kristen',
+            'Sikh',
+            'Buddha',
+            'Jain',
+            'OTHER'
+        ];
+
+        return $output;
+    }
+
     private function document_upload($enquiry_number = null, $document_type = 'unidentified', $datas = null)
     {
         $output = [
@@ -840,6 +859,9 @@ class Leads_model extends CI_model
                 'last_name' => substr(strtoupper(@$datas['last_name']), 0, 50),
                 'date_of_birth' => date('Y-m-d', strtotime(@$datas['date_of_birth'])),
                 'aadhaar_number' => substr(@$datas['aadhaar_number'], 0, 12),
+                'father_name' => substr(strtoupper(@$datas['father_name']), 0, 100),
+                'mother_name' => substr(strtoupper(@$datas['mother_name']), 0, 100),
+                'religion' => substr(strtoupper(@$datas['religion']), 0, 50),
                 'gender' => substr(@$datas['gender'], 0, 10),
                 'email' => substr(strtolower($datas['email']), 0, 100),
                 'phone' => substr($datas['phone'], 0, 15),
@@ -908,9 +930,15 @@ class Leads_model extends CI_model
             if (empty($datas['date_of_birth'])) {
                 unset($data_post['date_of_birth']);
             }
+
             if (empty($datas['aadhaar_number'])) {
                 unset($data_post['aadhaar_number']);
             }
+
+            if (empty($datas['religion'])) {
+                unset($data_post['religion']);
+            }
+
             if (empty($datas['gender'])) {
                 unset($data_post['gender']);
             }

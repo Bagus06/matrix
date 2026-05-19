@@ -56,8 +56,8 @@ function keyByValue(object, value) {
 }
 
 /* =================== Check empty value =================== */
-(function ($) {
-    $.empty = function (value) {
+(function($) {
+    $.empty = function(value) {
         if (value === null || value === undefined) return true;
         if (typeof value === 'string' && value === 'null') return true;
         if (typeof value === 'string' && value.trim().length === 0) return true;
@@ -72,8 +72,8 @@ function keyByValue(object, value) {
 /* ========================================================= */
 
 /* ====================== Init select2 ====================== */
-(function ($) {
-    $.select2 = function (option) {
+(function($) {
+    $.select2 = function(option) {
         $(option).select2({
             placeholder: "Select an Option",
             allowClear: true,
@@ -89,8 +89,8 @@ $(document).on('select2:open', () => {
 /* ==================================================== */
 
 /* ====================== Loader ====================== */
-(function ($) {
-    $.loader = function (option) {
+(function($) {
+    $.loader = function(option) {
         function preventScroll(e) {
             e.preventDefault();
         }
@@ -100,7 +100,7 @@ $(document).on('select2:open', () => {
             $('#loader').show()
 
             // Optionally disable keyboard scrolling (spacebar, page up/down, arrow keys)
-            $(document).on('keydown.scrollLock', function (e) {
+            $(document).on('keydown.scrollLock', function(e) {
                 const keys = [32, 33, 34, 35, 36, 37, 38, 39, 40]; // space, arrows, page up/down
                 if (keys.includes(e.which)) {
                     e.preventDefault();
@@ -124,8 +124,8 @@ $(document).on('select2:open', () => {
 /* ==================================================== */
 
 /* ====================== WhereClause View ====================== */
-(function ($) {
-    $.wcQueryView = function (option, value = '') {
+(function($) {
+    $.wcQueryView = function(option, value = '') {
         let output = false;
         const $wcView = $('#where-clause-view');
 
@@ -143,8 +143,8 @@ $(document).on('select2:open', () => {
 /* ============================================================== */
 
 /* ====================== Errors ====================== */
-(function ($) {
-    $.getErrorInfo = function (code = '', error = null) {
+(function($) {
+    $.getErrorInfo = function(code = '', error = null) {
         let output = 'Error code invalid';
 
         $.ajax({
@@ -155,7 +155,7 @@ $(document).on('select2:open', () => {
             data: {
                 error: encodeURIComponent(error)
             },
-            success: function (response) {
+            success: function(response) {
                 output = response;
             }
         })
@@ -167,12 +167,12 @@ $(document).on('select2:open', () => {
 
 /* ====================== Check menu active ====================== */
 
-(function ($) {
-    $.refreshMenu = function () {
-        $('#sidebar-menu .nav-link.active').each(function () {
+(function($) {
+    $.refreshMenu = function() {
+        $('#sidebar-menu .nav-link.active').each(function() {
             $(this)
                 .parents('li.nav-item')
-                .each(function () {
+                .each(function() {
                     $(this)
                         .addClass('menu-is-opening menu-open')
                         .children('a.nav-link')
@@ -184,30 +184,30 @@ $(document).on('select2:open', () => {
     }
 })(jQuery);
 
-$(document).ready(function () {
+$(document).ready(function() {
     $.refreshMenu();
 });
 
 /* ==================================================== */
 
 /* ====================== Downloading Function ====================== */
-(function ($) {
-    $.downloads = function (url, fileDirectory, filename) {
+(function($) {
+    $.downloads = function(url, fileDirectory, filename) {
         $.ajax({
             url: BASE_URL + url,
-            method: "GET",
+            type: "GET",
             data: {
                 file_directory: fileDirectory,
                 filename: filename
             },
             async: true,
-            beforeSend: function () {
+            beforeSend: function() {
                 $.loader('show')
             },
             xhrFields: {
                 responseType: 'blob'
             },
-            success: function (data, status, xhr) {
+            success: function(data, status, xhr) {
                 let contentType = xhr.getResponseHeader("Content-Type") || "application/octet-stream";
 
                 let disposition = xhr.getResponseHeader("Content-Disposition");
@@ -227,7 +227,7 @@ $(document).ready(function () {
 
                 $.loader('hide')
             },
-            error: function () {
+            error: function() {
                 $.loader('hide')
             }
         });

@@ -259,8 +259,8 @@ class University_courses extends CI_Controller
         $alert = null;
         $input_post = @$this->input->post();
 
-        $utilitys['course_level'] = ['Diploma', 'UG', 'PG', 'Doctorate'];
-        $utilitys['course_type'] = ['Full Time', 'Part Time', 'Distance', 'Online'];
+        $utilitys['course_level'] = $this->university_courses_model->course_level();
+        $utilitys['course_type'] = $this->university_courses_model->course_type();
         $get_params = [
             'select' => 'id, university_name, short_name',
             'row_status' => 1,
@@ -287,7 +287,7 @@ class University_courses extends CI_Controller
                     'code' => 'CREATE',
                     'message' => 'Create data successfully.',
                     'level'   => 'success',
-                    'redirectUrl' => ((!empty($create['data']['insert_id'])) ? base_url() . "$this->module/edit/" . encryptcst($create['data']['insert_id']) : '')
+                    'redirectUrl' => ((!empty($create['data']['insert_id'])) ? base_url() . "universities/detailed_info/" . encryptcst($input_post['university_id']) : '')
                 ];
             }
 
@@ -296,7 +296,7 @@ class University_courses extends CI_Controller
                     'code' => 'CREATE',
                     'message' => 'Create data successfully.',
                     'level' => 'success',
-                    'redirectUrl' => base_url() . "$this->module/edit/" . encryptcst($create['data']['insert_id'])
+                    'redirectUrl' => base_url() . "universities/detailed_info/" . encryptcst($input_post['university_id'])
                 ];
             } elseif (!empty($create)) {
                 $alert = get_error_info($create);
@@ -311,7 +311,6 @@ class University_courses extends CI_Controller
         $internal = [
             'edit_form' => 'form-edit',
             'save_form_url' => ((permit_check('FT_' . $this->module_alias . '_EDT', get_user()['id'])) ? base_url() . $this->uri->rsegments[1] . '/edit/' . $id : ''),
-            'module_main_url' => ((permit_check('FT_' . $this->module_alias . '_MAI', get_user()['id'])) ? base_url() . $this->uri->rsegments[1] . '/main' : ''),
             'create_url' => ((permit_check('FT_' . $this->module_alias . '_CRT', get_user()['id'])) ? base_url() . $this->uri->rsegments[1] . '/create' : ''),
             'create_title' => 'Create item',
             'create_form' => 'form-create',
@@ -321,8 +320,8 @@ class University_courses extends CI_Controller
         $input_post = @$this->input->post();
         $id = decryptcst($id);
 
-        $utilitys['course_level'] = ['Diploma', 'UG', 'PG', 'Doctorate'];
-        $utilitys['course_type'] = ['Online', 'Reguler', 'Speedtrack'];
+        $utilitys['course_level'] = $this->university_courses_model->course_level();
+        $utilitys['course_type'] = $this->university_courses_model->course_type();
         $get_params = [
             'select' => 'id, university_name, short_name',
             'row_status' => 1,
@@ -359,6 +358,7 @@ class University_courses extends CI_Controller
         $detailed = $this->university_courses_model->detailed($id);
         if ($detailed['status']) {
             $utilitys['data'] = $detailed['data'];
+            $internal['module_main_url'] = ((permit_check('FT_UNI_DTI', get_user()['id'])) ? base_url() . 'universities/detailed_info/' . encryptcst($utilitys['data']['university_id']) : '');
 
             // Format discount_duration for input daterangepicker
             if (!empty($detailed['data']['discount_duration_start']) && !empty($detailed['data']['discount_duration_end'])) {

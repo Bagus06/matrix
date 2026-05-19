@@ -12,6 +12,11 @@ switch ($this->uri->rsegments[2]) {
         break;
     case 'create':
     case 'edit':
+        echo '<script src="' . $base_directory . 'upload.js"></script>';
         echo '<script src="' . $base_directory . 'geolocation.js"></script>';
+        break;
+    case 'detailed_info':
+        echo '<script src="' . $base_directory . 'detailed_information.js"></script>';
+        echo '<script src="' . $base_directory . 'report.js"></script>';
         break;
 };

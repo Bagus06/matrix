@@ -2,13 +2,17 @@ $(document).ready(function() {
     var queryMandatory = [
         $('input[name="student_number"]'),
         $('input[name="date_of_birth"]'),
+        $('input[name="religion"]'),
         $('input[name="gender"]'),
         $('input[name="aadhaar_number"]'),
+        $('input[name="father_name"]'),
+        $('input[name="mother_name"]'),
         $('input[name="final_fees"]'),
         $('select[name="country_id"]'),
         $('select[name="state_id"]'),
         $('select[name="university_id"]'),
         $('select[name="course_id"]'),
+        $('input[name="session"]'),
         $('input[name="invoice_number"]'),
         $('input[name="total_amount"]'),
         $('input[name="discount_percent"]'),
@@ -39,6 +43,9 @@ $(document).ready(function() {
                 value.attr('required', true)
                 $label.html(label + ' <label class="text-danger mb-0">*</label>')
             })
+
+            studentInformationCollapse(collapse = 'show')
+            moreInformationCollapse(collapse = 'show')
         } else {
             // Loop for remove mandatory input
             $.each(queryMandatory, function(key, value) {
@@ -47,6 +54,11 @@ $(document).ready(function() {
                 value.attr('required', false)
                 $label.html(baseLabel[key])
             })
+
+            if (status === 'NO') {
+                studentInformationCollapse('hide')
+                moreInformationCollapse('hide')
+            }
         }
     }
 
@@ -61,6 +73,7 @@ $(document).ready(function() {
         let additionalCertificateFee = $('input[name="additional_certificate_fee"]').val()
 
         if (status === 'YES') {
+
             $.ajax({
                 url: BASE_URL + 'leads/is_status_yes',
                 type: 'GET',
@@ -225,4 +238,41 @@ $(document).ready(function() {
     $('select[name="status"], select[name="course_id"], select[name="source_code"]').on('change', function() {
         onChangeStatus()
     })
+
+    setTimeout(() => {
+        moreInformationCollapse()
+        studentInformationCollapse()
+    }, 500);
+
+    function moreInformationCollapse(collapse = '') {
+        $moreInformation = $('#more_information');
+
+        if (collapse == 'show') {
+            $moreInformation.addClass('show');
+        } else if (collapse != 'hide') {
+            $moreInformation.removeClass('show');
+        } else {
+            if ($moreInformation.hasClass('show')) {
+                $moreInformation.removeClass('show');
+            } else {
+                $moreInformation.addClass('show');
+            }
+        }
+    }
+
+    function studentInformationCollapse(collapse = '') {
+        $studentInformation = $('#student_information');
+
+        if (collapse == 'show') {
+            $studentInformation.addClass('show');
+        } else if (collapse == 'hide') {
+            $studentInformation.removeClass('show');
+        } else {
+            if ($studentInformation.hasClass('show')) {
+                $studentInformation.removeClass('show');
+            } else {
+                $studentInformation.addClass('show');
+            }
+        }
+    }
 })

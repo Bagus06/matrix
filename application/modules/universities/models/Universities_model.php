@@ -568,6 +568,161 @@ class Universities_model extends CI_model
         return $output;
     }
 
+
+    private function logo_upload($university_name = null, $datas = null)
+    {
+        $output = [
+            'status' => FALSE,
+            'code' => null,
+            'replace_code_value' => null,
+            'redirectUrl' => null,
+            'debug' => [
+                'file' => __FILE__,
+                'line' => __LINE__,
+                'hint' => ''
+            ],
+            'data' => null
+        ];
+
+        if (!empty($datas)) {
+            $base_path = FCPATH . 'uploads/universities_logo/';
+
+            // create folder if not exists
+            if (!is_dir($base_path)) {
+                mkdir($base_path, 0775, true);
+            }
+
+            $ext = strtolower(pathinfo($datas['name'], PATHINFO_EXTENSION));
+
+            $filename = strtoupper(str_replace(' ', '_', $university_name)) . '.' . $ext;
+
+            $upload_process = move_uploaded_file(@$datas['tmp_name'], $base_path . $filename);
+            if ($upload_process) {
+                $output = [
+                    'status' => TRUE,
+                    'code' => null,
+                    'replace_code_value' => null,
+                    'redirectUrl' => null,
+                    'debug' => null,
+                    'data' => [
+                        'university_name' => strtolower($university_name),
+                        'filename' => $filename,
+                        'bash_path' => $base_path . $filename
+                    ]
+                ];
+            } else {
+                $output = [
+                    'status' => FALSE,
+                    'code' => "$this->error_prefix-CNU-E003",
+                    'replace_code_value' => null,
+                    'redirectUrl' => null,
+                    'debug' => [
+                        'file' => __FILE__,
+                        'line' => __LINE__,
+                        'hint' => ''
+                    ],
+                    'data' => null
+                ];
+            }
+        } else {
+            $output = [
+                'status' => FALSE,
+                'code' => "$this->error_prefix-CNU-E002",
+                'replace_code_value' => null,
+                'redirectUrl' => null,
+                'debug' => [
+                    'file' => __FILE__,
+                    'line' => __LINE__,
+                    'hint' => ''
+                ],
+                'data' => null
+            ];
+        }
+
+        return $output;
+    }
+
+    private function logo_remove($filename = null)
+    {
+        $output = [
+            'status' => FALSE,
+            'code' => null,
+            'replace_code_value' => null,
+            'redirectUrl' => null,
+            'debug' => [
+                'file' => __FILE__,
+                'line' => __LINE__,
+                'hint' => ''
+            ],
+            'data' => null
+        ];
+
+        if (!empty($filename)) {
+            $base_path = FCPATH . 'uploads/universities_logo/';
+
+            // create folder if not exists
+            if (!is_dir($base_path)) {
+                mkdir($base_path, 0775, true);
+            }
+
+            if (is_file($base_path . $filename)) {
+                unlink($base_path . $filename);
+            }
+
+            $output = [
+                'status' => TRUE,
+                'code' => null,
+                'replace_code_value' => null,
+                'redirectUrl' => null,
+                'debug' => null,
+                'data' => null
+            ];
+        } else {
+            $output = [
+                'status' => FALSE,
+                'code' => "$this->error_prefix-CNU-E004",
+                'replace_code_value' => null,
+                'redirectUrl' => null,
+                'debug' => [
+                    'file' => __FILE__,
+                    'line' => __LINE__,
+                    'hint' => ''
+                ],
+                'data' => null
+            ];
+        }
+
+        return $output;
+    }
+
+    public function university_type()
+    {
+        $output = [
+            'Central University',
+            'State University',
+            'Private University',
+            'Institute of National Importance'
+        ];
+
+        return $output;
+    }
+
+    public function naac_grade()
+    {
+        $output = [
+            'A++',
+            'A+',
+            'A',
+            'B++',
+            'B+',
+            'B',
+            'C',
+            'Not Accredited'
+        ];
+
+        return $output;
+    }
+
     public function restore($id)
     {
         $output = [
@@ -662,7 +817,6 @@ class Universities_model extends CI_model
                 'relationship' => json_encode(((empty($datas['relationship'])) ? [] : $datas['relationship'])),
                 'description' => $datas['description'],
                 'note' => $datas['note'],
-                'logo' => @$datas['logo'],
                 'contact' => preg_replace('/[^0-9]/', '', @$datas['contact']),
                 'email' => $datas['email'],
                 'website' => $datas['website'],
@@ -675,6 +829,19 @@ class Universities_model extends CI_model
                 'status' => ((strtoupper(@$datas['status']) == 'ON') ? 'ACTIVE' : 'INACTIVE'),
                 'updated_by' => get_user()['id']
             ];
+
+            $exist = $this->detailed(null, 'row_status = 1 AND university_name = ' . $this->db->escape($data_post['university_name']));
+
+            /* ========================= Section Upload Logo ========================= */
+            if (!empty($_FILES['logo']['name'])) {
+                $logo_upload = $this->logo_upload($data_post['university_name'], $_FILES['logo']);
+                if ($logo_upload['status']) {
+                    $data_post['logo'] = @$logo_upload['data']['filename'];
+                }
+            } elseif (!empty($exist['data']['logo'])) {
+                $data_post['logo'] =  $exist['data']['logo'];
+            }
+            /* ======================================================================= */
 
             # Set string geolocation
             if (!empty($data_post['country_id'])) {
@@ -710,9 +877,17 @@ class Universities_model extends CI_model
                 unset($data_post['district_id']);
             }
 
-            $exist = $this->detailed(null, 'row_status = 1 AND university_name = ' . $this->db->escape($data_post['university_name']));
-
             if (!empty($id)) {
+
+                /* ====================== Section remove logo ====================== */
+
+                if (!empty($datas['remove_logo'])) {
+                    $data_post['logo'] = NULL;
+                    $remove_document = $this->document_remove(@$exist['data']['logo']);
+                }
+
+                /* ===================================================================== */
+
                 if (($id == @$exist['data']['id']) || empty($exist['data'])) {
                     $output = $this->universities($id, $data_post, 'PATCH');
                     if (!empty($output['data'])) {

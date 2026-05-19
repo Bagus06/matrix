@@ -1,0 +1,61 @@
+  .maintenance-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+  }
+  
+  .maintenance-title {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #343a40;
+  }
+  
+  .maintenance-subtitle {
+      color: #6c757d;
+      font-size: 1rem;
+      margin-top: 10px;
+  }
+  
+  .maintenance-badge {
+      display: inline-block;
+      margin-top: 15px;
+      padding: 8px 18px;
+      border-radius: 50px;
+      background: #ffc107;
+      color: #212529;
+      font-weight: 600;
+      font-size: 14px;
+  }
+  
+  .btn-home {
+      margin-top: 25px;
+      border-radius: 50px;
+      padding: 10px 24px;
+  }
+  
+  @keyframes fadeInUp {
+      from {
+          opacity: 0;
+          transform: translateY(30px);
+      }
+      to {
+          opacity: 1;
+          transform: translateY(0);
+      }
+  }
+  
+  .floating {
+      animation: floating 3s ease-in-out infinite;
+  }
+  
+  @keyframes floating {
+      0% {
+          transform: translateY(0px);
+      }
+      50% {
+          transform: translateY(-10px);
+      }
+      100% {
+          transform: translateY(0px);
+      }
+  }

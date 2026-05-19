@@ -21,7 +21,8 @@
 <body class="hold-transition login-page" style="background-image: url('<?= base_url() . 'assets/img/background/background1.jpg' ?>');">
     <script>
         window.AppData = Object.freeze({
-            alert: <?= json_encode($alert ?? "", JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) ?>
+            alert: <?= json_encode(@$alert ?? "", JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) ?>,
+            toastr: <?= json_encode(@$toastr ?? "", JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) ?>
         });
     </script>
 
@@ -54,12 +55,12 @@
                     </div>
                     <div class="row">
                         <div class="col-8">
-                            <div class="icheck-primary">
+                            <!-- <div class="icheck-primary">
                                 <input type="checkbox" id="remember" name="remember">
                                 <label for="remember">
                                     Remember Me
                                 </label>
-                            </div>
+                            </div> -->
                         </div>
                         <div class="col-4">
                             <button type="submit" class="btn btn-primary btn-block">Sign In</button>
@@ -67,9 +68,9 @@
                     </div>
                 </form>
 
-                <p class="mb-1">
+                <!-- <p class="mb-1">
                     <a href="#">I forgot my password</a>
-                </p>
+                </p> -->
             </div>
         </div>
     </div>

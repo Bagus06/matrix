@@ -1,0 +1,21 @@
+.imagePreview {
+    cursor: pointer;
+    pointer-events: auto;
+}
+
+.dropZone {
+    border: 2px dashed #ced4da;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: #fafafa;
+}
+
+.dropZone:hover {
+    background: #f1f3f5;
+}
+
+.dropZone.dragover {
+    border-color: #007bff;
+    background: #e7f1ff;
+}

@@ -6,10 +6,9 @@
     <div class="user-panel mt-4 pb-3 mb-3 d-flex">
         <div class="image">
             <?php
-            $profile = '.assets/img/profile/' .  @get_user()['photo'];
-
-            if (file_exists($profile)) {
-                $profile = @$utilitys['data']['photo'];
+            $profile = FCPATH . 'assets/img/profile/' .  @get_user()['photo'];
+            if (is_file($profile)) {
+                $profile =  @get_user()['photo'];
             } else {
                 $profile = 'default_profile.png';
             }

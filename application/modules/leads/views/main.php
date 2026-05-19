@@ -14,7 +14,7 @@
                                 <th col-type="">email</th>
                                 <th col-type="">assigned_to_name</th>
                                 <th col-type="">source_code</th>
-                                <th col-type="">status</th>
+                                <th col-type="">leads.status</th>
                                 <th col-type="datetimerange">updated_at</th>
                                 <th col-type="datetimerange">follow_up_date</th>
                                 <td col-type="" style="text-align:right"><?= (user_ag() == "mobile") ? "<button type='button' id='btn-col-search' class='btn btn-link'><i class='fa-solid fa-magnifying-glass'></i></button>" : "" ?></td>

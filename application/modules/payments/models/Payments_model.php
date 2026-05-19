@@ -815,8 +815,10 @@ class Payments_model extends CI_model
                 }
             } else {
                 if (empty($exist['data'])) {
+                    $data_post['status'] = 'UNPAID';
                     $data_post['row_status'] = 1;
                     $data_post['created_by'] = get_user()['id'];
+
                     $output = $this->payments(null, $data_post, 'POST');
                 } else {
                     $output = [

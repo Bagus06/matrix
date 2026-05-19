@@ -24,6 +24,7 @@ class Universities extends CI_Controller
         check_auth();
 
         $this->load->model('universities_model');
+        $this->load->model('university_courses/university_courses_model');
     }
 
     public function query_builder()
@@ -102,6 +103,8 @@ class Universities extends CI_Controller
                 $disabled_edit = 'disabled text-muted';
                 $edit_link = '';
 
+                $detailed_information_link = base_url() . "$this->module/detailed_info/" . encryptcst($value["id"]);
+
                 if ($data_get["row_status"] == 1) { // In mian page
                     # EDIT
                     if (permit_check('FT_' . $this->module_alias . '_EDT', get_user()['id'])) {
@@ -139,7 +142,7 @@ class Universities extends CI_Controller
                 $action .= $restore;
 
                 $row[] = '';
-                $row[] = $edit;
+                $row[] = "<a title='University Detailed Information' href='$detailed_information_link' class='btn-link btn-edit'>$item</a>";
                 $row[] = $value['short_name'];
                 $row[] = $value['university_type'];
                 $row[] = $value['ugc_code'];
@@ -182,6 +185,63 @@ class Universities extends CI_Controller
         echo json_encode($output);
     }
 
+    public function detailed_info($id = null)
+    {
+        $internal = [
+            'module_main_url' => ((permit_check('FT_' . $this->module_alias . '_MAI', get_user()['id'])) ? base_url() . $this->uri->rsegments[1] . '/main' : ''),
+            'university_courses_create_url' => ((permit_check('FT_UCS_CRT', get_user()['id'])) ? base_url() . 'university_courses/create' : ''),
+            'university_courses_create_title' => 'Create item',
+            'university_courses_create_form' => 'form-create',
+        ];
+
+        $utilitys = null;
+        $id = decryptcst($id);
+        $data_post = @$this->input->post();
+
+        $utilitys['course_level'] = $this->university_courses_model->course_level();
+        $utilitys['course_type'] = $this->university_courses_model->course_type();
+
+        $detailed = $this->universities_model->detailed($id);
+        if ($detailed['status']) {
+            $getting_data = [
+                'select' => 'university_courses.*, universities.university_name',
+                'row_status' => 1,
+                'outputtype' => 'data',
+                'order_by' => [
+                    'column' => 'course_name',
+                    'order' => 'ASC'
+                ],
+                'limit' => [
+                    'length' => -1,
+                    'start' => 0
+                ],
+                'bypass' => false,
+                'whereclause' => "university_id = '" . $id . "'"
+            ];
+
+            if (!empty($data_post['course_name'])) {
+                $getting_data['whereclause'] .= ' AND CONCAT(course_name, " ", course_code) LIKE ' . $this->db->escape('%' . $data_post['course_name'] . '%');
+            }
+
+            if (!empty($data_post['course_level'])) {
+                $getting_data['whereclause'] .= ' AND course_level = ' . $this->db->escape($data_post['course_level']);
+            }
+
+            if (!empty($data_post['course_type'])) {
+                $getting_data['whereclause'] .= ' AND course_type = ' . $this->db->escape($data_post['course_type']);
+            }
+
+            $utilitys['courses'] = $this->university_courses_model->courses(0, $getting_data, 'GET');
+
+            $utilitys['search'] = $data_post;
+            $utilitys['data'] = $detailed['data'];
+        } else {
+            sys_error_logs($detailed);
+        }
+
+        $this->load->view('index', ['internal' => $internal, 'utilitys' => $utilitys]);
+    }
+
     public function create()
     {
         $internal = [
@@ -193,8 +253,8 @@ class Universities extends CI_Controller
         $alert = null;
         $input_post = @$this->input->post();
 
-        $utilitys['university_type'] = ['Central University', 'State University', 'Private University', 'Institute of National Importance'];
-        $utilitys['naac_grade'] = ['A++', 'A+', 'A', 'B++', 'B+', 'B', 'C', 'Not Accredited'];
+        $utilitys['university_type'] = $this->universities_model->university_type();
+        $utilitys['naac_grade'] = $this->universities_model->naac_grade();
         $data_get_countries = [
             'select' => 'id, name, iso2',
             'row_status' => 1,
@@ -230,7 +290,7 @@ class Universities extends CI_Controller
                     'code' => 'CREATE',
                     'message' => 'Create data successfully.',
                     'level' => 'success',
-                    'redirectUrl' => base_url() . "$this->module/edit/" . encryptcst($create['data']['insert_id'])
+                    'redirectUrl' => base_url() . "$this->module/detailed_info/" . encryptcst($create['data']['insert_id'])
                 ];
             } elseif (!empty($create)) {
                 $alert = get_error_info($create);
@@ -255,8 +315,8 @@ class Universities extends CI_Controller
         $input_post = @$this->input->post();
         $id = decryptcst($id);
 
-        $utilitys['university_type'] = ['Central University', 'State University', 'Private University', 'Institute of National Importance'];
-        $utilitys['naac_grade'] = ['A++', 'A+', 'A', 'B++', 'B+', 'B', 'C', 'Not Accredited'];
+        $utilitys['university_type'] = $this->universities_model->university_type();
+        $utilitys['naac_grade'] = $this->universities_model->naac_grade();
         $data_get_countries = [
             'select' => 'id, name, iso2',
             'row_status' => 1,
@@ -283,7 +343,7 @@ class Universities extends CI_Controller
                     'code' => 'UPDATE',
                     'message' => 'Update data successfully.',
                     'level'   => 'success',
-                    'redirectUrl' => base_url() . "$this->module/edit/" . encryptcst($edit['data']['effected_id'])
+                    'redirectUrl' => base_url() . "$this->module/detailed_info/" . encryptcst($edit['data']['effected_id'])
                 ];
             } elseif (!empty($edit)) {
                 $alert = get_error_info($edit);

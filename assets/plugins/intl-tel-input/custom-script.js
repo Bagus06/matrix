@@ -33,7 +33,6 @@ $(document).ready(function() {
 
     inputs.forEach(function(input) {
         const iti = window.intlTelInput(input, {
-            initialCountry: "in",
             separateDialCode: false,
             formatOnDisplay: true,
             preferredCountries: ["in", "bd", "pk", "np"],
@@ -56,7 +55,6 @@ $(document).ready(function() {
             if (value) {
                 value = value.replace(/\D/g, "");
 
-                // 🔥 ONLY use setNumber (do NOT set input.value manually)
                 isProgrammaticChange = true;
                 iti.setNumber("+" + value);
                 isProgrammaticChange = false;

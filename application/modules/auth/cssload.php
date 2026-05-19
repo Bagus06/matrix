@@ -6,6 +6,8 @@
 
 <!-- ----------- Load other plugins ----------- -->
 <link rel="stylesheet" href="<?= base_url(); ?>assets/plugins/sweetalert2/sweetalert2.min.css">
+<link rel="stylesheet" href="<?= base_url() ?>assets/plugins/sweetalert2/bootstrap-4.min.css">
+<link rel="stylesheet" href="<?= base_url() ?>assets/plugins/toastr/toastr.min.css">
 <!-- ------------------------------------------ -->
 
 <?php

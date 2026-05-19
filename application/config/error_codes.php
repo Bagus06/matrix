@@ -1963,6 +1963,26 @@ $config['error_codes'] = [
                 'catext' => 'OK',
                 'redirectUrl' => null
             ],
+            'E003' => [
+                'message' => 'Failed to upload logo.',
+                'hint'    => 'Please ensure the file is valid and try again. If the issue persists, contact the administrator.',
+                'level'   => 'error',
+                'cobtn' => FALSE,
+                'cotext' => null,
+                'cabtn' => TRUE,
+                'catext' => 'OK',
+                'redirectUrl' => null
+            ],
+            'E004' => [
+                'message' => 'Invalid logo data.',
+                'hint'    => 'The file name is missing or not detected. Please select a file and try again.',
+                'level'   => 'error',
+                'cobtn' => FALSE,
+                'cotext' => null,
+                'cabtn' => TRUE,
+                'catext' => 'OK',
+                'redirectUrl' => null
+            ],
         ],
     ],
 
@@ -2781,7 +2801,7 @@ $config['error_codes'] = [
         'CNU' => [ // Error model function create_and_edit()
             'E001' => [
                 'message' => 'Sorry, the data you entered already exists.',
-                'hint'    => "The data entered already exists in the database, search based on the 'test' column",
+                'hint'    => "The data entered already exists in the database, search based on the 'invoice_number' column",
                 'level'   => 'warning',
                 'cobtn' => FALSE,
                 'cotext' => null,
@@ -2960,6 +2980,28 @@ $config['error_codes'] = [
             'E004' => [
                 'message' => 'Invalid document data.',
                 'hint'    => 'The file name is missing or not detected. Please select a file and try again.',
+                'level'   => 'error',
+                'cobtn' => FALSE,
+                'cotext' => null,
+                'cabtn' => TRUE,
+                'catext' => 'OK',
+                'redirectUrl' => null
+            ],
+        ],
+        'URP' => [ // Error function university_report()
+            'E001' => [
+                'message' => 'Report failed to generate. Please try again later, or contact the administrators.',
+                'hint'    => 'Failed to generate excel report on controller.',
+                'level'   => 'error',
+                'cobtn' => FALSE,
+                'cotext' => null,
+                'cabtn' => TRUE,
+                'catext' => 'OK',
+                'redirectUrl' => null
+            ],
+            'E002' => [
+                'message' => 'The data searched is empty.',
+                'hint'    => 'The student data you are looking for does not exist in the database.',
                 'level'   => 'error',
                 'cobtn' => FALSE,
                 'cotext' => null,

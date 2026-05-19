@@ -1,5 +1,11 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed');
 
+use PhpOffice\PhpSpreadsheet\Cell\DataType;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+
 class Students_model extends CI_model
 {
     protected $module_name = 'students';
@@ -8,10 +14,12 @@ class Students_model extends CI_model
     protected $tb2 = 'universities';
     protected $tb3 = 'university_courses';
     protected $tb4 = 'leads';
+    protected $tb5 = 'payments';
 
     public function __construct()
     {
         parent::__construct();
+        $this->load->model('universities/universities_model');
     }
 
     public function detailed($item_id = 0, $whereclause = '')
@@ -353,6 +361,7 @@ class Students_model extends CI_model
             $query .= " INNER JOIN $this->tb2 ON $this->tb1.university_id = $this->tb2.id";
             $query .= " INNER JOIN $this->tb3 ON $this->tb1.course_id = $this->tb3.id";
             $query .= " INNER JOIN $this->tb4 ON $this->tb1.enquiry_number = $this->tb4.enquiry_number";
+            $query .= " LEFT JOIN $this->tb5 ON $this->tb1.student_number = $this->tb5.student_number";
 
             $query .= " WHERE $this->tb1.row_status = $row_status";
             $query .= $this->whereclause_system($datas["bypass"]);
@@ -563,6 +572,283 @@ class Students_model extends CI_model
                     'file' => __FILE__,
                     'line' => __LINE__,
                     'hint' => '[Outputtype] empty or not the same as the parameters that have been determined. Fill the parameter with the value "data" or "query".'
+                ],
+                'data' => null
+            ];
+        }
+
+        return $output;
+    }
+
+    public function religion()
+    {
+        $output = [
+            'Hindu',
+            'Islam',
+            'Kristen',
+            'Sikh',
+            'Buddha',
+            'Jain',
+            'OTHER'
+        ];
+
+        return $output;
+    }
+
+    public function university_report($parameters = null)
+    {
+        $output = [
+            'status' => FALSE,
+            'code' => null,
+            'replace_code_value' => null,
+            'redirectUrl' => null,
+            'debug' => [
+                'file' => __FILE__,
+                'line' => __LINE__,
+                'hint' => ''
+            ],
+            'data' => null
+        ];
+
+        $get_params = [
+            'select' => 'students.*, university_courses.course_code, university_courses.course_name, payments.final_amount',
+            'row_status' => 1,
+            'outputtype' => 'data',
+            'order_by' => [
+                'column' => 'student_number',
+                'order' => 'ASC'
+            ],
+            'limit' => [
+                'length' => -1,
+                'start' => 0
+            ],
+            'bypass' => true,
+            'whereclause' => "students.university_id = '" . decryptcst(@$parameters['university_id']) . "' AND course_status = 'COMPLETED' AND completed_date BETWEEN '" . date('Y-m-d', strtotime(@$parameters['date_start'])) . "' AND '" . date('Y-m-d', strtotime(@$parameters['date_end'])) . "'"
+        ];
+        $datas_student = $this->students(0, $get_params, 'GET');
+        $university_detailed = $this->universities_model->detailed(decryptcst(@$parameters['university_id']), '');
+
+        if (!empty($datas_student['data']['data']) && !empty($university_detailed['data'])) {
+            $base_path = FCPATH . "assets/export/";
+
+            // create folder if not exists
+            if (!is_dir($base_path)) {
+                mkdir($base_path, 0775, true);
+            }
+
+            if (@$parameters['reportfor'] === 'university') {
+                $filename = @$university_detailed['data']['university_name'] . "-" . date('Ymd') . '.xlsx';
+
+                $path_file = $base_path . $filename;
+
+                if (!copy(FCPATH . "assets/modules/" . $this->uri->rsegments[1] . "/template_export/university_report.xlsx", $path_file)) {
+                }
+
+
+                $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($path_file);
+
+                $index = 1;
+                $sheet = $spreadsheet->getActiveSheet();
+
+
+                $sheet->setCellValue("A1", @$university_detailed['data']['university_name']);
+
+                $row_number_start = 3;
+                $row_number = $row_number_start;
+                foreach ($datas_student["data"]['data'] as $key => $value) {
+
+                    /** ----------------------------------------- Merge Row 1 ----------------------------------------- */
+                    $sheet->setCellValue("A" . $row_number, $index);
+                    $sheet->setCellValue("B" . $row_number, $value['full_name']);
+                    $sheet->setCellValue("C" . $row_number, $value['father_name']);
+                    $sheet->setCellValue("D" . $row_number, $value['mother_name']);
+                    $sheet->setCellValue("E" . $row_number, date('d F Y', strtotime($value['date_of_birth'])));
+                    $sheet->setCellValue("F" . $row_number, @$value['religion']);
+                    $sheet->setCellValue("G" . $row_number, $value['gender']);
+                    $sheet->setCellValue("H" . $row_number, ((!empty($value['state'])) ? $value['state'] : '-'));
+                    $sheet->setCellValue("I" . $row_number, ((!empty($value['city'])) ? $value['city'] : '-'));
+                    $sheet->setCellValue("J" . $row_number, $value['course_name'] . ' ( ' . $value['course_code'] . ' )');
+                    $sheet->setCellValue("K" . $row_number, @$value['dept']);
+                    $sheet->setCellValue("L" . $row_number, date('d F Y', strtotime($value['session'])));
+                    $sheet->setCellValueExplicit("M" . $row_number, @$value['phone'], DataType::TYPE_STRING);
+                    $sheet->setCellValue("N" . $row_number, @$value['email']);
+                    $sheet->setCellValue("O" . $row_number, @$value['address']);
+
+                    $student_photo = FCPATH . 'uploads/photo/' .  @$value['file_photo'];
+
+                    if (is_file($student_photo)) {
+                        $student_photo = FCPATH . '/uploads/photo/' .  @$value['file_photo'];
+                    } else {
+                        $student_photo = FCPATH . 'assets/img/profile/sample.png';
+                    }
+
+                    if (!empty($value['file_photo'])) {
+                        $drawing = new Drawing();
+                        $drawing->setName('Student Photo');
+                        $drawing->setPath($student_photo);
+                        $drawing->setHeight(100);
+                        $drawing->setCoordinates("P" . $row_number);
+                        $drawing->setOffsetX(10);
+                        $drawing->setOffsetY(10);
+                        $drawing->setWorksheet($sheet);
+                        $sheet->getRowDimension($row_number)->setRowHeight(100);
+                    } else {
+                        $sheet->setCellValue("P" . $row_number, 'Empty.');
+                    }
+
+                    $row_number++;
+                    $index++;
+                }
+
+                $style_column = [
+                    'borders' => [
+                        'allBorders' => [
+                            'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                        ],
+                    ]
+                ];
+
+                $spreadsheet->getActiveSheet()->getStyle("A" . $row_number_start . ":P" . $row_number)->applyFromArray($style_column);
+                $sheet->getColumnDimension('P')->setWidth(20);
+            } elseif (@$parameters['reportfor'] === 'internal') {
+                $filename = 'INTERNAL REPORT-' . @$university_detailed['data']['university_name'] . "-" . date('Ymd') . '.xlsx';
+
+                $path_file = $base_path . $filename;
+
+                if (!copy(FCPATH . "assets/modules/" . $this->uri->rsegments[1] . "/template_export/internal_report.xlsx", $path_file)) {
+                }
+
+
+                $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($path_file);
+
+                $index = 1;
+                $sheet = $spreadsheet->getActiveSheet();
+
+
+                $sheet->setCellValue("A1", 'INTERNAL REPORT - ' . @$university_detailed['data']['university_name']);
+
+                $row_number_start = 3;
+                $row_number = $row_number_start;
+                $total_fees = 0;
+                foreach ($datas_student["data"]['data'] as $key => $value) {
+
+                    /** ----------------------------------------- Merge Row 1 ----------------------------------------- */
+                    $sheet->setCellValue("A" . $row_number, $index);
+                    $sheet->setCellValue("B" . $row_number, $value['full_name']);
+                    $sheet->setCellValue("C" . $row_number, $value['father_name']);
+                    $sheet->setCellValue("D" . $row_number, $value['mother_name']);
+                    $sheet->setCellValue("E" . $row_number, date('d F Y', strtotime($value['date_of_birth'])));
+                    $sheet->setCellValue("F" . $row_number, @$value['religion']);
+                    $sheet->setCellValue("G" . $row_number, $value['gender']);
+                    $sheet->setCellValue("H" . $row_number, ((!empty($value['state'])) ? $value['state'] : '-'));
+                    $sheet->setCellValue("I" . $row_number, ((!empty($value['city'])) ? $value['city'] : '-'));
+                    $sheet->setCellValue("J" . $row_number, $value['course_name'] . ' ( ' . $value['course_code'] . ' )');
+                    $sheet->setCellValue("K" . $row_number, @$value['dept']);
+                    $sheet->setCellValue("L" . $row_number, date('d F Y', strtotime($value['session'])));
+                    $sheet->setCellValueExplicit("M" . $row_number, @$value['phone'], DataType::TYPE_STRING);
+                    $sheet->setCellValue("N" . $row_number, @$value['email']);
+                    $sheet->setCellValue("O" . $row_number, @$value['address']);
+
+                    $sheet->setCellValue("Q" . $row_number, @$value['final_amount']);
+                    $total_fees += (float) $value['final_amount'];
+
+                    $student_photo = FCPATH . 'uploads/photo/' .  @$value['file_photo'];
+
+                    if (is_file($student_photo)) {
+                        $student_photo = FCPATH . '/uploads/photo/' .  @$value['file_photo'];
+                    } else {
+                        $student_photo = FCPATH . 'assets/img/profile/sample.png';
+                    }
+
+                    if (!empty($value['file_photo'])) {
+                        $drawing = new Drawing();
+                        $drawing->setName('Student Photo');
+                        $drawing->setPath($student_photo);
+                        $drawing->setHeight(100);
+                        $drawing->setCoordinates("P" . $row_number);
+                        $drawing->setOffsetX(10);
+                        $drawing->setOffsetY(10);
+                        $drawing->setWorksheet($sheet);
+                        $sheet->getRowDimension($row_number)->setRowHeight(100);
+                    } else {
+                        $sheet->setCellValue("P" . $row_number, 'Empty.');
+                    }
+
+                    $row_number++;
+                    $index++;
+                }
+
+                $sheet->mergeCells("A$row_number:P$row_number");
+                $sheet->setCellValue("A" . $row_number, 'TOTAL : ');
+                $sheet->getStyle("A" . $row_number)->applyFromArray([
+                    'font' => [
+                        'bold' => true,
+                    ],
+                    'alignment' => [
+                        'horizontal' => Alignment::HORIZONTAL_RIGHT,
+                    ],
+                ]);
+
+                $sheet->setCellValue("Q" . $row_number, $total_fees);
+                $sheet->getStyle("Q" . $row_number)->applyFromArray([
+                    'font' => [
+                        'bold' => true,
+                    ],
+                    'alignment' => [
+                        'horizontal' => Alignment::HORIZONTAL_RIGHT,
+                    ],
+                ]);
+
+                $style_column = [
+                    'borders' => [
+                        'allBorders' => [
+                            'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                        ],
+                    ]
+                ];
+
+                $spreadsheet->getActiveSheet()->getStyle("A" . $row_number_start . ":Q" . $row_number)->applyFromArray($style_column);
+                $sheet->getColumnDimension('P')->setWidth(20);
+            }
+
+            $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+
+            if ($writer->save($path_file) == '') {
+                $output = [
+                    'status' => TRUE,
+                    'code' => null,
+                    'replace_code_value' => null,
+                    'redirectUrl' => null,
+                    'debug' => null,
+                    'data' => [
+                        'filename' => $filename,
+                        'path' => $base_path
+                    ]
+                ];
+            } else {
+                $output = [
+                    'status' => FALSE,
+                    'code' => "$this->error_prefix-URP-E001",
+                    'replace_code_value' => null,
+                    'redirectUrl' => null,
+                    'debug' => [
+                        'file' => __FILE__,
+                        'line' => __LINE__,
+                        'hint' => ''
+                    ],
+                    'data' => null
+                ];
+            }
+        } else {
+            $output = [
+                'status' => FALSE,
+                'code' => "$this->error_prefix-URP-E002",
+                'replace_code_value' => null,
+                'redirectUrl' => null,
+                'debug' => [
+                    'file' => __FILE__,
+                    'line' => __LINE__,
+                    'hint' => ''
                 ],
                 'data' => null
             ];
@@ -804,6 +1090,9 @@ class Students_model extends CI_model
                 'student_number' => substr(strtoupper($datas['student_number']), 0, 15),
                 'university_id' => @$datas['university_id'],
                 'course_id' => @$datas['course_id'],
+                'dept' => substr(@$datas['dept'], 0, 255),
+                'course_status' => substr(strtoupper(@$datas['course_status']), 0, 20),
+                'session' => date('Y-m-d', strtotime(@$datas['session'])),
                 'enquiry_number' => substr(strtoupper(@$datas['enquiry_number']), 0, 15),
                 'final_fees' => round((float) preg_match('/^\d+(\.\d{1,2})?$/', $amount = preg_replace('/[^0-9.]/', '', $datas['final_fees'])) ? $amount : 0, 2),
                 'additional_certificate' => @$datas['additional_certificate'],
@@ -813,6 +1102,9 @@ class Students_model extends CI_model
                 'last_name' => substr(@$datas['last_name'], 0, 50),
                 'date_of_birth' => date('Y-m-d', strtotime($datas['date_of_birth'])),
                 'aadhaar_number' => substr(@$datas['aadhaar_number'], 0, 12),
+                'father_name' => substr(strtoupper(@$datas['father_name']), 0, 100),
+                'mother_name' => substr(strtoupper(@$datas['mother_name']), 0, 100),
+                'religion' => substr(strtoupper(@$datas['religion']), 0, 50),
                 'gender' => substr(@$datas['gender'], 0, 10),
                 'email' => substr(@$datas['email'], 0, 100),
                 'phone' => substr(preg_replace('/[^0-9]/', '', @$datas['phone']), 0, 100),
@@ -827,58 +1119,88 @@ class Students_model extends CI_model
             ];
 
             $leads_detailed = $this->leads_model->detailed('', "enquiry_number = '" . @$data_post['enquiry_number'] . "'");
+            $exist = $this->detailed(null, "$this->tb1.row_status = 1 AND aadhaar_number = " . $this->db->escape($data_post['aadhaar_number']) . " AND $this->tb1.university_id = " . $this->db->escape(@$data_post['university_id']) . " AND $this->tb1.course_id = " . $this->db->escape(@$data_post['course_id']));
 
             /* ========================= Section Upload Document ========================= */
+
+            # Upload file_aadhaar
             if (!empty($_FILES['file_aadhaar']['name'])) {
                 $aadhaar_upload = $this->document_upload($data_post['enquiry_number'], 'aadhaar', $_FILES['file_aadhaar']);
                 if ($aadhaar_upload['status']) {
                     $data_post['file_aadhaar'] = @$aadhaar_upload['data']['filename'];
                 }
+            } elseif (!empty($exist['data']['file_aadhaar'])) {
+                $data_post['file_aadhaar'] =  $exist['data']['file_aadhaar'];
             } elseif (!empty($leads_detailed['data']['file_aadhaar'])) {
                 $data_post['file_aadhaar'] =  $leads_detailed['data']['file_aadhaar'];
             }
 
+            # Upload file_photo
             if (!empty($_FILES['file_photo']['name'])) {
                 $photo_upload = $this->document_upload($data_post['enquiry_number'], 'photo', $_FILES['file_photo']);
                 if ($photo_upload['status']) {
                     $data_post['file_photo'] = @$photo_upload['data']['filename'];
                 }
+            } elseif (!empty($exist['data']['file_photo'])) {
+                $data_post['file_photo'] =  $exist['data']['file_photo'];
             } elseif (!empty($leads_detailed['data']['file_photo'])) {
                 $data_post['file_photo'] =  $leads_detailed['data']['file_photo'];
             }
 
+            # Upload file_certificate
+            if (!empty($_FILES['file_certificate']['name'])) {
+                $certificate_upload = $this->document_upload($data_post['enquiry_number'], 'certificate', $_FILES['file_certificate']);
+                if ($certificate_upload['status']) {
+                    $data_post['certificate'] = @$certificate_upload['data']['filename'];
+                }
+            } elseif (!empty($exist['data']['certificate'])) {
+                $data_post['certificate'] =  $exist['data']['certificate'];
+            }
+
+            # Upload file_certificate1
             if (!empty($_FILES['file_certificate1']['name'])) {
                 $certificate1_upload = $this->document_upload($data_post['enquiry_number'], 'certificate1', $_FILES['file_certificate1']);
                 if ($certificate1_upload['status']) {
                     $data_post['file_certificate1'] = @$certificate1_upload['data']['filename'];
                 }
+            } elseif (!empty($exist['data']['file_certificate1'])) {
+                $data_post['file_certificate1'] =  $exist['data']['file_certificate1'];
             } elseif (!empty($leads_detailed['data']['file_certificate1'])) {
                 $data_post['file_certificate1'] =  $leads_detailed['data']['file_certificate1'];
             }
 
+            # Upload file_certificate2
             if (!empty($_FILES['file_certificate2']['name'])) {
                 $certificate2_upload = $this->document_upload($data_post['enquiry_number'], 'certificate2', $_FILES['file_certificate2']);
                 if ($certificate2_upload['status']) {
                     $data_post['file_certificate2'] = @$certificate2_upload['data']['filename'];
                 }
+            } elseif (!empty($exist['data']['file_certificate2'])) {
+                $data_post['file_certificate2'] =  $exist['data']['file_certificate2'];
             } elseif (!empty($leads_detailed['data']['file_certificate2'])) {
                 $data_post['file_certificate2'] =  $leads_detailed['data']['file_certificate2'];
             }
 
+            # Upload file_certificate3
             if (!empty($_FILES['file_certificate3']['name'])) {
                 $certificate3_upload = $this->document_upload($data_post['enquiry_number'], 'certificate3', $_FILES['file_certificate3']);
                 if ($certificate3_upload['status']) {
                     $data_post['file_certificate3'] = @$certificate3_upload['data']['filename'];
                 }
+            } elseif (!empty($exist['data']['file_certificate3'])) {
+                $data_post['file_certificate3'] =  $exist['data']['file_certificate3'];
             } elseif (!empty($leads_detailed['data']['file_certificate3'])) {
                 $data_post['file_certificate3'] =  $leads_detailed['data']['file_certificate3'];
             }
 
+            # Upload file_certificate4
             if (!empty($_FILES['file_certificate4']['name'])) {
                 $certificate4_upload = $this->document_upload($data_post['enquiry_number'], 'certificate4', $_FILES['file_certificate4']);
                 if ($certificate4_upload['status']) {
                     $data_post['file_certificate4'] = @$certificate4_upload['data']['filename'];
                 }
+            } elseif (!empty($exist['data']['file_certificate4'])) {
+                $data_post['file_certificate4'] =  $exist['data']['file_certificate4'];
             } elseif (!empty($leads_detailed['data']['file_certificate4'])) {
                 $data_post['file_certificate4'] =  $leads_detailed['data']['file_certificate4'];
             }
@@ -889,11 +1211,42 @@ class Students_model extends CI_model
             if (empty($datas['enquiry_number'])) {
                 unset($data_post['enquiry_number']);
             }
+
             if (empty($datas['university_id'])) {
                 unset($data_post['university_id']);
             }
+
             if (empty($datas['course_id'])) {
                 unset($data_post['course_id']);
+            }
+
+            if (empty($datas['date_of_birth'])) {
+                unset($data_post['date_of_birth']);
+            }
+
+            if (empty($datas['aadhaar_number'])) {
+                unset($data_post['aadhaar_number']);
+            }
+
+            if (empty($datas['religion'])) {
+                unset($data_post['religion']);
+            }
+
+            if (empty($datas['gender'])) {
+                unset($data_post['gender']);
+            }
+
+            if (empty($datas['course_status'])) {
+                unset($data_post['course_status']);
+                $data_post['completed_date'] = NULL;
+
+                if (!empty($exist['data']['course_status'])) {
+                    $data_post['course_status'] = NULL;
+                }
+            } else {
+                if (strtoupper($datas['course_status']) === 'COMPLETED') {
+                    $data_post['completed_date'] = date('Y-m-d');
+                }
             }
 
             # Set string geolocation
@@ -930,8 +1283,6 @@ class Students_model extends CI_model
                 unset($data_post['district_id']);
             }
 
-            $exist = $this->detailed(null, "$this->tb1.row_status = 1 AND aadhaar_number = " . $this->db->escape($data_post['aadhaar_number']) . " AND $this->tb1.university_id = " . $this->db->escape(@$data_post['university_id']) . " AND $this->tb1.course_id = " . $this->db->escape(@$data_post['course_id']));
-
             if (!empty($id)) {
 
                 /* ====================== Section remove document ====================== */
@@ -944,6 +1295,11 @@ class Students_model extends CI_model
                 if (!empty($datas['remove_file_photo'])) {
                     $data_post['file_photo'] = NULL;
                     $remove_document = $this->document_remove('photo', @$exist['data']['file_photo']);
+                }
+
+                if (!empty($datas['remove_file_certificate'])) {
+                    $data_post['certificate'] = NULL;
+                    $remove_document = $this->document_remove('certificate', @$exist['data']['certificate']);
                 }
 
                 if (!empty($datas['remove_file_certificate1'])) {

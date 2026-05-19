@@ -22,10 +22,13 @@ if (file_exists($filename)) {
 
 <!-- ----------- Load other plugins ----------- -->
 <script type="text/javascript" src="<?= base_url(); ?>assets/plugins/sweetalert2/sweetalert2.all.min.js"></script>
+<script type="text/javascript" src="<?= base_url(); ?>assets/plugins/toastr/toastr.min.js"></script>
 <!-- ------------------------------------------ -->
+
 
 <script type="text/javascript" src="<?= base_url() ?>assets/plugins/invy/uri.invy.js"></script>
 <script type="text/javascript" src="<?= base_url() ?>assets/plugins/invy/alert.invy.js"></script>
+<script type="text/javascript" src="<?= base_url() ?>assets/plugins/invy/app.invy.js"></script>
 <script type="text/javascript" src="<?= base_url() ?>assets/plugins/invy/global-function.invy.js"></script>
 
 <?php

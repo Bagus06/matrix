@@ -250,6 +250,42 @@ class Students extends CI_Controller
         echo json_encode($output);
     }
 
+    public function downloads()
+    {
+        $input_get = $this->input->get();
+
+        $filename = basename($input_get['filename'] ?? '');
+
+        $file = $input_get['file_directory'] . $input_get['filename'];
+
+        if (!file_exists($file)) {
+            http_response_code(404);
+        }
+
+        // Detect MIME type otomatis
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $mime  = finfo_file($finfo, $file);
+        finfo_close($finfo);
+
+        header("Content-Type: $mime");
+        header("Content-Disposition: attachment; filename=\"$filename\"");
+        header("Content-Length: " . filesize($file));
+        header("Cache-Control: no-cache");
+
+        readfile($file);
+        exit;
+    }
+
+    public function university_report()
+    {
+        $input_get = @$this->input->get();
+
+        $output = $this->students_model->university_report($input_get);
+
+        sys_error_logs($output);
+        echo json_encode($output);
+    }
+
     public function detailed($id = null)
     {
         $output = null;
@@ -442,6 +478,7 @@ class Students extends CI_Controller
         $input_post = @$this->input->post();
         $id = decryptcst($id);
 
+        $utilitys['religion'] = $this->students_model->religion();
         $data_get_universities = [
             'select' => 'id, university_name, short_name',
             'row_status' => 1,
@@ -568,6 +605,7 @@ class Students extends CI_Controller
         $detailed = $this->students_model->detailed($id);
         $output = $this->students_model->students($id, @$detailed['data']['row_status'], 'DELETE');
 
+        sys_error_logs($output);
         echo json_encode($output);
     }
 

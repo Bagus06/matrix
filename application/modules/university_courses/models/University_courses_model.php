@@ -566,6 +566,27 @@ class University_courses_model extends CI_model
         return $output;
     }
 
+    public function course_level()
+    {
+        $output = [
+            'Diploma',
+            'UG',
+            'PG',
+            'Doctorate'
+        ];
+        return $output;
+    }
+
+    public function course_type()
+    {
+        $output = [
+            'Online',
+            'Regular',
+            'Speedtrack'
+        ];
+        return $output;
+    }
+
     public function restore($id)
     {
         $output = [

@@ -19,6 +19,14 @@
                     <div class="p-0">
                         <a href="<?= @$internal['save_form_url']; ?>" title="Save" class="btn btn-link btn-save <?= ((empty(@$internal['save_form_url'])) ? 'disabled' : ''); ?>" data-formname="<?= ((empty($internal['create_form'])) ? @$internal['edit_form'] : @$internal['create_form']) ?>" <?= ((empty(@$internal['save_form_url'])) ? 'disabled' : ''); ?>><i class="fa-solid fa-floppy-disk"></i></a>
                     </div>
+
+                    <?php
+                    $filename = FCPATH . '/application/modules/' . $this->uri->rsegments[1] . '/views/controllbar.php';
+
+                    if (file_exists($filename)) {
+                        require($filename);
+                    }
+                    ?>
                 </div>
             </div>
         </div>

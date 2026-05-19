@@ -1,19 +1,19 @@
-(function ($) {
-    $.deleteItem = function (options) {
+(function($) {
+    $.deleteItem = function(options) {
         let itemData = null;
         $.ajax({
             url: BASE_URL + options.module + '/detailed/' + options.id,
             type: 'GET',
             dataType: 'json',
             async: false,
-            beforeSend: function () {
+            beforeSend: function() {
                 $.loader('show');
             },
-            success: function (response) {
+            success: function(response) {
                 $.loader('hide');
                 itemData = response;
             },
-            error: function (params) {
+            error: function(params) {
                 let errInfo = $.getErrorInfo('SYS-BUG-E001')
 
                 if (!$.empty(errInfo)) {
@@ -26,7 +26,7 @@
                     })
                 }
 
-                $.loader('show');
+                $.loader('hide');
             }
         })
 
@@ -46,17 +46,17 @@
                 cotext: 'Delete',
                 cabtn: true,
                 catext: 'Cancel',
-                alertResponse: function (res) {
+                alertResponse: function(res) {
                     if (res.alertResponse.isConfirmed) {
                         $.ajax({
                             url: BASE_URL + options.module + '/delete/' + options.id,
                             type: 'DELETE',
                             dataType: 'json',
                             async: true,
-                            beforeSend: function () {
+                            beforeSend: function() {
                                 $.loader('show');
                             },
-                            success: function (response) {
+                            success: function(response) {
                                 if (response.status) {
                                     $.invyAlert({
                                         title: 'DELETE',
@@ -78,7 +78,7 @@
 
                                 $.loader('hide')
                             },
-                            error: function (params) {
+                            error: function(params) {
                                 let errInfo = $.getErrorInfo('SYS-BUG-E001')
 
                                 if (!$.empty(errInfo)) {
@@ -120,12 +120,25 @@
     }
 })(jQuery);
 
-$('table>tbody').on('click', '.btn-delete', function () {
+$('table>tbody').on('click', '.btn-delete', function() {
     let itemID = $(this).data('id');
     let itemDelete = $(this).data('item');
 
     $.deleteItem({
         module: jsURI[1],
+        id: itemID,
+        itemDeleteName: itemDelete,
+        redirectUrl: ''
+    })
+})
+
+$(document).on('click', '.btn-delete-external', function() {
+    let module = $(this).data('module');
+    let itemID = $(this).data('id');
+    let itemDelete = $(this).data('item');
+
+    $.deleteItem({
+        module: module,
         id: itemID,
         itemDeleteName: itemDelete,
         redirectUrl: ''

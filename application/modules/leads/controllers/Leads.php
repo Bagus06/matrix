@@ -492,6 +492,7 @@ class Leads extends CI_Controller
         $alert = null;
         $input_post = @$this->input->post();
 
+        $utilitys['religion'] = $this->leads_model->religion();
         $data_get_universities = [
             'select' => 'id, university_name, short_name',
             'row_status' => 1,
@@ -631,7 +632,7 @@ class Leads extends CI_Controller
                 $alert = get_error_info($create);
             }
         } else {
-            $utilitys['data']['follow_up_date'] = date('Y-m-d');
+            $utilitys['data']['follow_up_date'] = date('Y-m-d', strtotime('+1 days'));
             $utilitys['data']['assigned_to'] = get_user()['id'];
             $utilitys['data']['enquiry_number'] = last_booked_number('ENQ-' . date('ymd') . '-', 3);
             create_booked_number($utilitys['data']['enquiry_number']);
@@ -656,6 +657,7 @@ class Leads extends CI_Controller
         $input_post = @$this->input->post();
         $id = decryptcst($id);
 
+        $utilitys['religion'] = $this->leads_model->religion();
         $data_get_universities = [
             'select' => 'id, university_name, short_name',
             'row_status' => 1,
