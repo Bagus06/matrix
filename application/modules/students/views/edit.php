@@ -170,8 +170,8 @@
                             <small class="text-danger pl-3" id="err-district_id" style="display: none;"></small>
                         </div>
                         <div class="form-group">
-                            <label class="pb-0 mb-0" id=" lbl-address">Address <label class="text-danger">*</label></label>
-                            <textarea type="text" class="form-control bg-transparant w-100" rows="4" name="address" value="<?= @$utilitys['data']['address'] ?>" required><?= @$utilitys['data']['address'] ?></textarea>
+                            <label class="pb-0 mb-0" id=" lbl-address">Address</label>
+                            <textarea type="text" class="form-control bg-transparant w-100" rows="4" name="address" value="<?= @$utilitys['data']['address'] ?>"><?= @$utilitys['data']['address'] ?></textarea>
                             <small class="text-danger pl-3" id="err-address" style="display: none;"></small>
                         </div>
                         <div class="form-group">
@@ -197,7 +197,7 @@
                         </div>
                         <div class="form-group">
                             <label class="pb-0 mb-0" id="lbl-university_id">University <label class="text-danger">*</label></label>
-                            <select class="form-control bg-transparant w-100" title="Select university for course" name="university_id" <?= ((user_group_check('GR_ADMIN', get_user()['id']) && (@$utilitys['data_invoice']['data']['approval_status'] != 'APPROVED')) ? '' : 'disabled'); ?> required>
+                            <select class="form-control bg-transparant w-100" title="Select university for course" name="university_id" <?= ((user_group_check('GR_ADMIN', get_user()['id']) && (@$utilitys['data_invoice']['data']['approval_status'] != 'APPROVED')) ? '' : 'readonly'); ?> required>
                                 <option value="">--SELECT--</option>
                                 <?php if (!empty($utilitys['universities']['data']['data'])) : ?>
                                     <?php foreach ($utilitys['universities']['data']['data'] as $key => $value) : ?>
@@ -216,7 +216,7 @@
                         <div class="form-group">
                             <label class="pb-0 mb-0" id="lbl-course_id">Course <label class="text-danger">*</label></label>
 
-                            <select class="form-control bg-transparant w-100" title="Select course" name="course_id" <?= ((user_group_check('GR_ADMIN', get_user()['id']) && (@$utilitys['data_invoice']['data']['approval_status'] != 'APPROVED')) ? '' : 'disabled'); ?> required>
+                            <select class="form-control bg-transparant w-100" title="Select course" name="course_id" <?= ((user_group_check('GR_ADMIN', get_user()['id']) && (@$utilitys['data_invoice']['data']['approval_status'] != 'APPROVED')) ? '' : 'readonly'); ?> required>
                                 <option value="<?= @$utilitys['data']['course_id']; ?>" <?= ((!empty(@$utilitys['data']['course_id'])) ? 'selected' : '') ?>>--SELECT--</option>
                             </select>
                             <small class="text-danger pl-3" id="err-course_id" style="display: none;"></small>
@@ -248,7 +248,31 @@
                         </div>
                         <div class="form-group">
                             <label class="mb-0" id="lbl-session">Session</label>
-                            <input type="date" class="form-control bg-transparent" placeholder="YYYY-MM-DD" inputmode="numeric" pattern="^\d{4}-\d{2}-\d{2}$" autocomplete="off" name="session" value="<?= ((!empty($utilitys['data_student']['session'])) ? $utilitys['data_student']['session'] : @$utilitys['data']['session']) ?>">
+                            <input type="text" class="form-control bg-transparent yearrangepicker" placeholder="Study Periode" autocomplete="off" name="session" value="<?= @$utilitys['data']['session']; ?>" readonly>
+                            <div class="year-dropdown">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <label>Start Year</label>
+                                        <select id="startYear" class="form-control">
+                                        </select>
+                                    </div>
+                                    <div class="col-6">
+                                        <label>End Year</label>
+                                        <select id="endYear" class="form-control">
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="mt-3 text-right">
+                                    <button type="button" class="btn btn-secondary btn-sm" id="cancelYear">
+                                        Cancel
+                                    </button>
+
+                                    <button type="button" class="btn btn-primary btn-sm" id="applyYear">
+                                        Apply
+                                    </button>
+                                </div>
+
+                            </div>
                             <small class="text-danger pl-3" id="err-session" style="display: none;"></small>
                         </div>
                         <div class="form-group">
@@ -258,7 +282,7 @@
                         </div>
                         <div class="form-group">
                             <label id="lbl-additional_certificate_fee">Additional certificate or attestation fee</label>
-                            <input type="number" class="form-control bg-transparant" name="additional_certificate_fee" placeholder="Enter amount (INR)" inputmode="decimal" autocomplete="off" step="0.01" min="0" title="Enter amount in Indian Rupees (numbers only, up to 2 decimals)" value="<?= @$utilitys['data']['additional_certificate_fee'] ?>">
+                            <input type="number" class="form-control bg-transparant" name="additional_certificate_fee" placeholder="Enter amount (INR)" inputmode="decimal" autocomplete="off" step="0.01" min="0" title="Enter amount in Indian Rupees (numbers only, up to 2 decimals)" value="<?= @$utilitys['data']['additional_certificate_fee'] ?>" <?= ((user_group_check('GR_ADMIN', get_user()['id']) && (@$utilitys['data_invoice']['data']['approval_status'] != 'APPROVED')) ? '' : 'readonly'); ?>>
                             <small class="text-danger pl-3" id="err-additional_certificate_fee" style="display: none;"></small>
                         </div>
                         <div class="form-group">
@@ -306,7 +330,7 @@
                         </div>
                         <div class="form-group">
                             <label class="pb-2" id="lbl-source_code">Leads Source</label>
-                            <select class="form-control bg-transparant w-100" name="source_code" disabled required>
+                            <select class="form-control bg-transparant w-100" name="source_code" readonly required>
                                 <option value="">--SELECT--</option>
                                 <?php if (!empty($utilitys['leads_sources']['data']['data'])) : ?>
                                     <?php foreach ($utilitys['leads_sources']['data']['data'] as $key => $value) : ?>
@@ -325,12 +349,12 @@
                             <small class="text-danger pl-3" id="err-source_code" style="display: none;"></small>
                         </div>
                         <div class="form-group">
-                            <textarea type="text" class="form-control bg-transparant w-100" rows="2" name="source_information" value="<?= @$utilitys['data_leads']['data']['source_information'] ?>" disabled><?= @$utilitys['data_leads']['data']['source_information'] ?></textarea>
+                            <textarea type="text" class="form-control bg-transparant w-100" rows="2" name="source_information" value="<?= @$utilitys['data_leads']['data']['source_information'] ?>" readonly><?= @$utilitys['data_leads']['data']['source_information'] ?></textarea>
                             <small class="text-danger pl-3" id="err-source_information" style="display: none;"></small>
                         </div>
                         <div class="form-group">
                             <label class="pb-2" id="lbl-priority">Priority</label>
-                            <select class="form-control bg-transparant w-100" name="priority" <?= ((@$utilitys['data_leads']['data']['status'] === 'YES') ? 'readonly' : '') ?> disabled required>
+                            <select class="form-control bg-transparant w-100" name="priority" <?= ((@$utilitys['data_leads']['data']['status'] === 'YES') ? 'readonly' : '') ?> required>
                                 <option value=""><span class="text-muted text-italic">Select an Option</span></option>
                                 <?php if (!empty($utilitys['priority'])) : ?>
                                     <?php foreach ($utilitys['priority'] as $key => $value) : ?>
@@ -348,12 +372,12 @@
                         </div>
                         <div class="form-group">
                             <label id="lbl-follow_up_date">Follow up Date</label>
-                            <input type="date" class="form-control bg-transparant" name="follow_up_date" value="<?= @$utilitys['data_leads']['data']['follow_up_date'] ?>" disabled required>
+                            <input type="date" class="form-control bg-transparant" name="follow_up_date" value="<?= @$utilitys['data_leads']['data']['follow_up_date'] ?>" readonly required>
                             <small class="text-danger pl-3" id="err-follow_up_date" style="display: none;"></small>
                         </div>
                         <div class="form-group">
                             <label class="pb-2" id="lbl-status">Status</label>
-                            <select class="form-control bg-transparant w-100" name="status" <?= ((@$utilitys['data_leads']['data']['status'] === 'YES') ? 'readonly' : '') ?> disabled required>
+                            <select class="form-control bg-transparant w-100" name="status" <?= ((@$utilitys['data_leads']['data']['status'] === 'YES') ? 'readonly' : '') ?> required>
                                 <option value=""><span class="text-muted text-light text-italic" style="color: #999;">Select an Option</span></option>
                                 <?php if (!empty($utilitys['status'])) : ?>
                                     <?php foreach ($utilitys['status'] as $key => $value) : ?>
@@ -371,12 +395,12 @@
                         </div>
                         <div class="form-group">
                             <label id="lbl-note">Note</label>
-                            <textarea type="text" class="form-control bg-transparant" name="note" value="<?= @$utilitys['data_leads']['data']['note'] ?>" disabled><?= ((empty($utilitys['data_leads']['data']['note'])) ? 'Empty' : $utilitys['data_leads']['data']['note']) ?></textarea>
+                            <textarea type="text" class="form-control bg-transparant" name="note" value="<?= @$utilitys['data_leads']['data']['note'] ?>" readonly><?= ((empty($utilitys['data_leads']['data']['note'])) ? 'Empty' : $utilitys['data_leads']['data']['note']) ?></textarea>
                             <small class="text-danger pl-3" id="err-note" style="display: none;"></small>
                         </div>
                         <div class="form-group">
                             <label class="pb-2" id="lbl-assigned_to">Assigned Counselor</label>
-                            <select class="form-control bg-transparant w-100" name="assigned_to" <?= ((!empty(@$utilitys['data_leads']['data']['assigned_to'])) ? 'readonly' : ''); ?> disabled required>
+                            <select class="form-control bg-transparant w-100" name="assigned_to" <?= ((!empty(@$utilitys['data_leads']['data']['assigned_to'])) ? 'readonly' : ''); ?> required>
                                 <option value=""><span class="text-muted text-light text-italic">Select an Option</span></option>
                                 <?php if (!empty($utilitys['assigned']['data']['data'])) : ?>
                                     <?php foreach ($utilitys['assigned']['data']['data'] as $key => $value) : ?>
@@ -403,6 +427,11 @@
                         <span class="text-lg font-weight-bold"><i class="fa-solid fa-wallet"></i> PAYMENT INFORMATION</span>
                     </div>
                     <div class="form-group">
+                        <label id="lbl-invoice_number">Invoice Number</label>
+                        <input type="text" class="form-control bg-transparant" name="invoice_number" value="<?= @$utilitys['data_payment']['data']['invoice_number'] ?>" readonly>
+                        <small class="text-danger pl-3" id="err-invoice_number" style="display: none;"></small>
+                    </div>
+                    <div class="form-group">
                         <label id="lbl-status">Status</label>
                         <input type="text" class="form-control bg-transparant" name="status" value="<?= @$utilitys['data_payment']['data']['status'] ?>" readonly>
                         <small class="text-danger pl-3" id="err-status" style="display: none;"></small>
@@ -412,23 +441,31 @@
                         <input type="number" class="form-control bg-transparant" name="total_amount" inputmode="decimal" step="0.01" min="0" value="<?= @$utilitys['data_payment']['data']['total_amount'] ?>" readonly>
                         <small class="text-danger pl-3" id="err-total_amount" style="display: none;"></small>
                     </div>
-                    <div class="form-group">
-                        <label id="lbl-discount_percent">Discount</label>
-                        <input type="number" class="form-control bg-transparant" name="discount_percent" inputmode="decimal" step="0.01" min="0" value="<?= @$utilitys['data_payment']['data']['discount_percent'] ?>" readonly>
-                        <small class="text-danger pl-3" id="err-discount_percent" style="display: none;"></small>
+                    <div class="row col-12 m-0 p-0">
+                        <div class="col-4 m-0 p-0">
+                            <div class="form-group">
+                                <label id="lbl-discount">Discount</label>
+                                <input type="number" class="form-control bg-transparant" name="discount" inputmode="decimal" step="0.01" min="0" value="<?= @$utilitys['data_payment']['data']['discount'] ?>" readonly>
+                                <small class="text-danger pl-3" id="err-discount" style="display: none;"></small>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="form-group">
+                                <label id="lbl-aditional_discount">Aditional Discount</label>
+                                <input type="number" class="form-control bg-transparant" name="aditional_discount" inputmode="decimal" step="0.01" min="0" value="<?= @$utilitys['data_payment']['data']['aditional_discount'] ?>" <?= ((user_group_check('GR_ADMIN', get_user()['id']) && (@$utilitys['data_invoice']['data']['approval_status'] != 'APPROVED')) ? '' : 'readonly'); ?>>
+                                <small class="text-danger pl-3" id="err-aditional_discount" style="display: none;"></small>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="form-group">
+                                <label id="lbl-total_discount">Total Discount</label>
+                                <input type="number" class="form-control bg-transparant" name="total_discount" inputmode="decimal" step="0.01" min="0" value="<?= @$utilitys['data_payment']['data']['total_discount'] ?>" readonly>
+                                <small class="text-danger pl-3" id="err-total_discount" style="display: none;"></small>
+                            </div>
+                        </div>
                     </div>
                     <div class="form-group">
-                        <label id="lbl-aditional_discount_percent">Aditional Discount</label>
-                        <input type="number" class="form-control bg-transparant" name="aditional_discount_percent" inputmode="decimal" step="0.01" min="0" value="<?= @$utilitys['data_payment']['data']['aditional_discount_percent'] ?>" <?= ((user_group_check('GR_ADMIN', get_user()['id']) && (@$utilitys['data_invoice']['data']['approval_status'] != 'APPROVED')) ? '' : 'readonly'); ?>>
-                        <small class="text-danger pl-3" id="err-aditional_discount_percent" style="display: none;"></small>
-                    </div>
-                    <div class="form-group">
-                        <label id="lbl-total_discount_percent">Total Discount</label>
-                        <input type="number" class="form-control bg-transparant" name="total_discount_percent" inputmode="decimal" step="0.01" min="0" value="<?= @$utilitys['data_payment']['data']['total_discount_percent'] ?>" readonly>
-                        <small class="text-danger pl-3" id="err-total_discount_percent" style="display: none;"></small>
-                    </div>
-                    <div class="form-group">
-                        <label id="lbl-tax_percent">TAX</label>
+                        <label id="lbl-tax_percent">TAX Percent</label>
                         <input type="number" class="form-control bg-transparant" name="tax_percent" inputmode="decimal" step="0.01" min="0" value="<?= @$utilitys['data_payment']['data']['tax_percent'] ?>" <?= ((user_group_check('GR_ADMIN', get_user()['id']) && (@$utilitys['data_invoice']['data']['approval_status'] != 'APPROVED')) ? '' : 'readonly'); ?>>
                         <small class="text-danger pl-3" id="err-tax_percent" style="display: none;"></small>
                     </div>
@@ -437,29 +474,25 @@
                         <input type="number" class="form-control bg-transparant" name="final_amount" inputmode="decimal" step="0.01" min="0" value="<?= @$utilitys['data_payment']['data']['final_amount'] ?>" readonly>
                         <small class="text-danger pl-3" id="err-final_amount" style="display: none;"></small>
                     </div>
-                    <div class="form-group">
-                        <label id="lbl-remaining_balance">Remaining Balance</label>
-                        <input type="number" class="form-control bg-transparant" name="remaining_balance" inputmode="decimal" step="0.01" min="0" value="<?= @$utilitys['data_payment']['data']['remaining_balance'] ?>" readonly>
-                        <small class="text-danger pl-3" id="err-remaining_balance" style="display: none;"></small>
-                    </div>
                     <hr>
                     <div class="col-12 pb-3">
                         <span class="text-sm text-primary font-weight-bold">ADVANCE</span>
                     </div>
-                    <div class="form-group">
-                        <label id="lbl-invoice_number">Invoice Number</label>
-                        <input type="text" class="form-control bg-transparant" name="invoice_number" value="<?= @$utilitys['data_payment']['data']['invoice_number'] ?>" readonly>
-                        <small class="text-danger pl-3" id="err-invoice_number" style="display: none;"></small>
-                    </div>
-                    <div class="form-group">
-                        <label id="lbl-advance_percent">Advance Percent</label>
-                        <input type="number" class="form-control bg-transparant" name="advance_percent" inputmode="decimal" step="0.01" min="0" value="<?= @$utilitys['data_payment']['data']['advance_percent'] ?>" <?= ((user_group_check('GR_ADMIN', get_user()['id']) && (@$utilitys['data_invoice']['data']['approval_status'] != 'APPROVED')) ? '' : 'readonly'); ?>>
-                        <small class="text-danger pl-3" id="err-advance_percent" style="display: none;"></small>
-                    </div>
-                    <div class="form-group">
-                        <label id="lbl-advance_amount">Advance Amount</label>
-                        <input type="number" class="form-control bg-transparant" name="advance_amount" inputmode="decimal" step="0.01" min="0" value="<?= @$utilitys['data_payment']['data']['advance_amount'] ?>" readonly>
-                        <small class="text-danger pl-3" id="err-advance_amount" style="display: none;"></small>
+                    <div class="row col-12 m-0 p-0">
+                        <div class="col-8 m-0 p-0">
+                            <div class="form-group">
+                                <label id="lbl-advance_amount">Advance Amount</label>
+                                <input type="number" class="form-control bg-transparant" name="advance_amount" inputmode="decimal" step="0.01" min="0" value="<?= @$utilitys['data_payment']['data']['advance_amount'] ?>" readonly>
+                                <small class="text-danger pl-3" id="err-advance_amount" style="display: none;"></small>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="form-group">
+                                <label id="lbl-advance_percent">Advance Percent</label>
+                                <input type="number" class="form-control bg-transparant" name="advance_percent" inputmode="decimal" step="0.01" min="0" value="<?= @$utilitys['data_payment']['data']['advance_percent'] ?>" <?= ((user_group_check('GR_ADMIN', get_user()['id']) && (@$utilitys['data_invoice']['data']['approval_status'] != 'APPROVED')) ? '' : 'readonly'); ?>>
+                                <small class="text-danger pl-3" id="err-advance_percent" style="display: none;"></small>
+                            </div>
+                        </div>
                     </div>
                     <div class="form-group">
                         <label id="lbl-advance_date">Advance Date</label>
@@ -471,22 +504,33 @@
                         <span class="text-sm text-primary font-weight-bold">FINAL PAYMENT</span>
                     </div>
                     <div class="form-group">
-                        <label id="lbl-due_date">Final Payment Due Date</label>
-                        <input type="date" class="form-control bg-transparant" name="due_date" value="<?= @$utilitys['data_payment']['data']['due_date'] ?>" <?= ((user_group_check('GR_ADMIN', get_user()['id']) && (@$utilitys['data_invoice']['data']['approval_status'] != 'APPROVED')) ? '' : 'readonly'); ?>>
-                        <small class="text-danger pl-3" id="err-due_date" style="display: none;"></small>
+                        <label id="lbl-remaining_balance">Remaining Balance</label>
+                        <input type="number" class="form-control bg-transparant" name="remaining_balance" inputmode="decimal" step="0.01" min="0" value="<?= @$utilitys['data_payment']['data']['remaining_balance'] ?>" readonly>
+                        <small class="text-danger pl-3" id="err-remaining_balance" style="display: none;"></small>
                     </div>
                     <div class="form-group">
                         <label id="lbl-final_payment">Final Payment</label>
                         <input type="number" class="form-control bg-transparant" name="final_payment" inputmode="decimal" step="0.01" min="0" value="<?= @$utilitys['data_payment']['data']['final_payment'] ?>" readonly>
                         <small class="text-danger pl-3" id="err-final_payment" style="display: none;"></small>
                     </div>
-                    <div class="form-group">
-                        <label id="lbl-final_payment_date">Final Payment Date</label>
-                        <input type="date" class="form-control bg-transparant" name="final_payment_date" value="<?= @$utilitys['data_payment']['data']['final_payment_date'] ?>" readonly>
-                        <small class="text-danger pl-3" id="err-final_payment_date" style="display: none;"></small>
+                    <div class="row col-12 m-0 p-0">
+                        <div class="col-6 p-0 m-0">
+                            <div class="form-group">
+                                <label id="lbl-due_date">Final Payment Due Date</label>
+                                <input type="date" class="form-control bg-transparant" name="due_date" value="<?= @$utilitys['data_payment']['data']['due_date'] ?>" <?= ((user_group_check('GR_ADMIN', get_user()['id']) && (@$utilitys['data_invoice']['data']['approval_status'] != 'APPROVED')) ? '' : 'readonly'); ?>>
+                                <small class="text-danger pl-3" id="err-due_date" style="display: none;"></small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label id="lbl-final_payment_date">Final Payment Date</label>
+                                <input type="date" class="form-control bg-transparant" name="final_payment_date" value="<?= @$utilitys['data_payment']['data']['final_payment_date'] ?>" readonly>
+                                <small class="text-danger pl-3" id="err-final_payment_date" style="display: none;"></small>
+                            </div>
+                        </div>
                     </div>
                     <button type="button" class="btn btn-outline-primary w-100" data-invoicestatus="<?= @$utilitys['data_invoice']['data']['approval_status']; ?>" id="btn-advence-invoice" <?= (((strtoupper(@$utilitys['data_invoice']['data']['approval_status']) !== 'APPROVED') && !user_group_check('GR_ADMIN', get_user()['id'])) ? 'disabled' : ''); ?>><?= ((strtoupper(@$utilitys['data_invoice']['data']['approval_status']) === 'APPROVED') ? 'Download Invoice' : 'Release Invoice'); ?></button>
-                    <button class="btn btn-outline-primary w-100 mt-2" id="btn-receipt">Release Receipt</button>
+                    <button type="button" class="btn btn-outline-primary w-100 mt-2" id="btn-receipt">Release Receipt</button>
                 </div>
             </div>
         </div>

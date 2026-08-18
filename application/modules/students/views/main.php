@@ -8,8 +8,8 @@
                         <thead>
                             <tr class="th-src">
                                 <th></th>
-                                <th col-type="">student_number</th>
-                                <th col-type="">full_name</th>
+                                <th col-type="">students.student_number</th>
+                                <th col-type="">students.full_name</th>
                                 <th col-type="">students.phone</th>
                                 <th col-type="">students.email</th>
                                 <th col-type="">university_name</th>

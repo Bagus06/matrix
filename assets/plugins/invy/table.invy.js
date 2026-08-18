@@ -4,6 +4,7 @@
             identitiy: '',
             table_main: true,
             url: 'question',
+            ajaxData: {},
             style: {
                 orderableCol: {},
                 colNowrap: {},
@@ -296,11 +297,15 @@
                         url: settings.url,
                         type: 'GET',
                         dataType: 'json',
-                        data: {
-                            whereclause: (((switchPageQuery !== undefined) && (switchPageQuery !== '')) ? switchPageQuery : wcQuery),
-                            page: ((switchPageQuery !== '') ? 'inbox' : 'main'),
-                            real_page: jsURI[2],
-                            row_status: jsURI[2] == 'recycle' ? 0 : 1,
+                        data: function(data) {
+                            const baseData = {
+                                whereclause: (((switchPageQuery !== undefined) && (switchPageQuery !== '')) ? switchPageQuery : wcQuery),
+                                page: ((switchPageQuery !== '') ? 'inbox' : 'main'),
+                                real_page: jsURI[2],
+                                row_status: jsURI[2] == 'recycle' ? 0 : 1,
+                            };
+                            const extraData = (typeof settings.ajaxData === 'function') ? settings.ajaxData() : settings.ajaxData;
+                            return $.extend(data, baseData, extraData || {});
                         }
                     },
                     fnDrawCallback: function(response) {

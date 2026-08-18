@@ -3,8 +3,8 @@ $base_directory = base_url() . 'assets/modules/' . $this->uri->rsegments[1] . '/
 
 switch ($this->uri->rsegments[2]) {
     case 'main':
-        // echo '<script src="' . $base_directory . '{js file name}';
-        echo '<script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>';
+        echo '<script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>';
+        echo '<script src="' . $base_directory . 'default_script.js"></script>';
         break;
     case 'recycle':
         // echo '<script src="' . $base_directory . '{js file name}';

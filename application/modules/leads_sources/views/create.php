@@ -64,12 +64,12 @@
                         <small class="text-danger pl-3" id="err-address" style="display: none;"></small>
                     </div>
                     <div class="form-group">
-                        <label id="lbl-discount">Discount (Percent)</label>
-                        <input type="number" class="form-control bg-transparant" name="discount" min="0" max="100" value="<?= @$utilitys['data']['discount'] ?>">
+                        <label id="lbl-discount">Discount</label>
+                        <input type="number" class="form-control bg-transparant" name="discount" inputmode="decimal" step="0.01" min="0" value="<?= @$utilitys['data']['discount'] ?>">
                         <small class="text-danger pl-3" id="err-discount" style="display: none;"></small>
                     </div>
                     <div class="form-group">
-                        <label id="lbl-email">Email</label>
+                        <label id="lbl-email">Email <label class="text-danger mb-0">*</label></label>
                         <input type="email" class="form-control bg-transparent" placeholder="yourname@example.com" minlength="6" maxlength="64" pattern="^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[A-Za-z]{2,}$" inputmode="email" autocomplete="email" name="email" value="<?= @$utilitys['data']['email'] ?>">
                         <small class="text-danger pl-3" id="err-email" style="display: none;"></small>
                     </div>

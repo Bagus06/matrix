@@ -1,0 +1,12 @@
+.year-dropdown {
+    position: absolute;
+    z-index: 9999;
+    background: #fff;
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+    width: 60%;
+    padding: 15px;
+    margin-top: 2px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+    display: none;
+}

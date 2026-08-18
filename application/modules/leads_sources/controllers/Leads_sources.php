@@ -22,6 +22,7 @@ class Leads_sources extends CI_Controller
         parent::__construct();
         # Uncomment for use user login check
         check_auth();
+        sync_booked_number('source_code', 'leads_sources');
 
         $this->load->model('leads_sources_model');
     }
@@ -272,7 +273,7 @@ class Leads_sources extends CI_Controller
                 $row[] = ((empty($value['b2b_company_name'])) ? '<span class="text-muted font-italic">Empty</span>' : $value['b2b_company_name']);
                 $row[] = ((empty($value['ref_name'])) ? '<span class="text-muted font-italic">Empty</span>' : $value['ref_name']);
                 $row[] = ((empty($value['address'])) ? '<span class="text-muted font-italic">Empty</span>' : $value['address']);
-                $row[] = ((empty($value['discount'])) ? '<span class="text-muted font-italic">Empty</span>' : $value['discount'] . '%');
+                $row[] = ((empty($value['discount'])) ? '<span class="text-muted font-italic">Empty</span>' : INR($value['discount']));
                 $row[] = ((empty($value['phone'])) ? '<span class="text-muted font-italic">Empty</span>' : $value['phone']);
                 $row[] = ((empty($value['email'])) ? '<span class="text-muted font-italic">Empty</span>' : $value['email']);
                 $row[] = $action;

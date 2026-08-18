@@ -418,7 +418,7 @@
         <!-- FIXED BOTTOM -->
         <div class="terms">
             <strong>Terms and Condition :</strong><br><br>
-            Payment must be made within 1x24 hours from the invoice date for a minimum down payment of 0.00% or 0.00, and the maximum payment must be made before . The certificate will be issued after the payment receipt is issued.<br><br>
+            Payment must be made within 1x24 hours from the invoice date for a minimum down payment of <?= @$utilitys['payment']['data']['advance_percent']; ?>% or <?= INR(@$utilitys['payment']['data']['advance_amount']); ?>, and the maximum payment must be made before . The certificate will be issued after the payment receipt is issued.<br><br>
             For further questions, please reach out to MODWAY International Academy at info@modway.co.in or 8590822500
         </div>
 

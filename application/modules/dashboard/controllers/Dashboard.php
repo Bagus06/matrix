@@ -18,11 +18,25 @@ class Dashboard extends CI_Controller
 
     public function main()
     {
-        if (user_group_check('GR_MKTST', get_user()['id']) && !user_group_check('GR_ADMIN', get_user()['id'])) {
+        if (!$this->can_view_admin_dashboard()) {
             redirect(base_url() . 'leads/create');
         }
 
         $this->load->view('index');
+    }
+
+    public function overview()
+    {
+        if (!$this->can_view_admin_dashboard()) {
+            return $this->output->set_status_header(403)->set_content_type('application/json')->set_output(json_encode(['status'=>false,'message'=>'Access denied.']));
+        }
+        return $this->output->set_content_type('application/json','utf-8')->set_output(json_encode(['status'=>true,'data'=>$this->dashboard_model->admin_overview()]));
+    }
+
+    private function can_view_admin_dashboard()
+    {
+        $user=get_user();
+        return strtoupper($user['username'])==='DEVELOPER'||user_group_check('GR_ADMIN',$user['id']);
     }
 
     public function agent()

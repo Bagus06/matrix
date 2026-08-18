@@ -23,6 +23,7 @@ class Universities extends CI_Controller
         # Uncomment for use user login check
         check_auth();
 
+        $this->load->helper('text');
         $this->load->model('universities_model');
         $this->load->model('university_courses/university_courses_model');
     }

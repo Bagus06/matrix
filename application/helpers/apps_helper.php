@@ -46,6 +46,35 @@ if (!function_exists('hasDecimalValue')) {
     }
 }
 
+if (!function_exists('init_booked_number')) {
+    function sync_booked_number($target_column, $target_table)
+    {
+        $output = FALSE;
+        $CI = &get_instance();
+
+        $query = "SELECT $target_table.$target_column, apps_booked_number.number FROM $target_table LEFT JOIN apps_booked_number ON apps_booked_number.number = $target_table.$target_column WHERE apps_booked_number.used = 0 OR apps_booked_number.number IS NULL";
+        $get_number_null = $CI->db->query($query)->result_array();
+
+        if (empty($CI->db->error()['code'])) {
+            $output = TRUE;
+        }
+
+        if (!empty($get_number_null)) {
+            foreach ($get_number_null as $key => $value) {
+                if (empty($value['number'])) {
+                    $query = "INSERT INTO `apps_booked_number`(`number`, `used`) VALUES (" . $CI->db->escape($value[$target_column]) . ", 1)";
+                    $insert = $CI->db->query($query);
+                } else if (!empty($value['number'])) {
+                    $query = "UPDATE apps_booked_number SET used = 1 WHERE number = " . $CI->db->escape($value['number']);
+                    $update = $CI->db->query($query);
+                }
+            }
+        }
+
+        return $output;
+    }
+}
+
 if (!function_exists('remove_booked_number_not_used')) {
     function remove_booked_number_not_used()
     {

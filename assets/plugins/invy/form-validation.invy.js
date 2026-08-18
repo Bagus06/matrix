@@ -25,6 +25,20 @@
 
 /* ======================== Validation for on type or paste ======================== */
 $(document).ready(function() {
+    $(document).on('mousedown.readonly', 'select', function(e) {
+        if ($(this).attr('readonly')) {
+            e.preventDefault();
+            return false;
+        }
+    });
+
+    $(document).on('select2:opening.readonly', 'select', function(e) {
+        if ($(this).attr('readonly')) {
+            e.preventDefault();
+            return false;
+        }
+    });
+
     $('input').on('input paste', function() {
         const name = $(this).attr('name')
         const type = $(this).attr('type')

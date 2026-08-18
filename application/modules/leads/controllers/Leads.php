@@ -20,8 +20,10 @@ class Leads extends CI_Controller
         parent::__construct();
         # Uncomment for use user login check
         check_auth();
+        sync_booked_number('enquiry_number', 'leads');
 
         $this->load->model('leads_model');
+        $this->load->model('lead_contact_logs_model');
         $this->load->model('users/users_model');
         $this->load->model('leads_sources/leads_sources_model');
         $this->load->model('universities/universities_model');
@@ -166,6 +168,93 @@ class Leads extends CI_Controller
             $output = $this->payments_model->calculation_fee($input_get);
         }
         echo json_encode($output);
+    }
+
+    private function create_contact_log_from_form($lead_id = null, $input_post = null, $contact_context = null)
+    {
+        $output = null;
+
+        if (empty($input_post['record_call'])) {
+            return $output;
+        }
+
+        $required_permission = $contact_context === 'NEW_LEAD' ? 'FT_LDS_CRT' : 'FT_LDS_EDT';
+        if (!permit_check($required_permission, get_user()['id'])) {
+            $output = [
+                'status' => FALSE,
+                'code' => null,
+                'replace_code_value' => null,
+                'redirectUrl' => null,
+                'debug' => null,
+                'message' => 'Lead was saved, but you do not have permission to record the call.',
+                'data' => null
+            ];
+
+            return $output;
+        }
+
+        $contact_result = strtoupper(trim((string) @$input_post['contact_result']));
+        if (!in_array($contact_result, ['RESPONDED', 'NO_RESPONSE'])) {
+            $output = [
+                'status' => FALSE,
+                'code' => null,
+                'replace_code_value' => null,
+                'redirectUrl' => null,
+                'debug' => null,
+                'message' => 'Lead was saved, but the call log was not saved because the call result is invalid.',
+                'data' => null
+            ];
+
+            return $output;
+        }
+
+        $lead = $this->leads_model->detailed((int) $lead_id);
+        $user = get_user();
+        $can_access_all = strtoupper($user['username']) === 'DEVELOPER'
+            || user_group_check('GR_ADMIN', $user['id']);
+        if (empty($lead['status']) || empty($lead['data']) || (int) $lead['data']['row_status'] !== 1
+            || (!$can_access_all && (int) $lead['data']['assigned_to'] !== (int) $user['id'])) {
+            $output = [
+                'status' => FALSE,
+                'code' => null,
+                'replace_code_value' => null,
+                'redirectUrl' => null,
+                'debug' => null,
+                'message' => 'Lead was saved, but the call log could not be linked to your account.',
+                'data' => null
+            ];
+
+            return $output;
+        }
+
+        $datas = [
+            'lead_id' => (int) $lead_id,
+            'contact_context' => $contact_context,
+            'contact_result' => $contact_result,
+            'note' => substr(trim((string) @$input_post['contact_note']), 0, 255)
+        ];
+        $output = $this->lead_contact_logs_model->create_and_edit(null, $datas);
+
+        return $output;
+    }
+
+    private function append_contact_log_result(&$alert, $contact_log = null)
+    {
+        if ($contact_log === null) {
+            return;
+        }
+
+        sys_error_logs($contact_log);
+        if (!empty($contact_log['status'])) {
+            $alert['message'] .= ' Call log saved successfully.';
+            return;
+        }
+
+        $message = !empty($contact_log['message'])
+            ? $contact_log['message']
+            : 'Call log failed to save.';
+        $alert['message'] .= ' ' . $message;
+        $alert['level'] = 'warning';
     }
 
     public function recycle()
@@ -317,13 +406,10 @@ class Leads extends CI_Controller
                 $student = $this->students_model->create_and_edit($detailed_student['data']['id'], $datas);
             } else {
                 $student = $this->students_model->create_and_edit(0, $datas);
-
-                if ($student['status']) {
-                    update_booked_number(1, $datas['student_number']);
-                }
             }
 
             if (@$student['status']) {
+                $update_booked_number = update_booked_number(1, $datas['student_number']);
                 if (!empty(@$student['data']['insert_id'])) {
                     $output = [
                         'status' => true,
@@ -366,9 +452,9 @@ class Leads extends CI_Controller
             if (!empty($fees['data'])) {
                 $datas['total_amount'] = $fees['data']['total_amount'];
                 $datas['additional_certificate_fee'] = $datas['additional_certificate_fee'];
-                $datas['discount_percent'] = @$fees['data']['discount_percent'];
-                $datas['aditional_discount_percent'] = @$fees['data']['aditional_discount_percent'];
-                $datas['total_discount_percent'] = @$fees['data']['total_discount_percent'];
+                $datas['discount'] = @$fees['data']['discount'];
+                $datas['aditional_discount'] = @$fees['data']['aditional_discount'];
+                $datas['total_discount'] = @$fees['data']['total_discount'];
                 $datas['tax_percent'] = @$datas['tax_percent'];
                 $datas['final_amount'] = $fees['data']['final_amount'];
                 $datas['advance_percent'] = @$datas['advance_percent'];
@@ -379,21 +465,21 @@ class Leads extends CI_Controller
 
 
             if (!empty($detailed_payment['data']['id'])) {
-                $student = $this->payments_model->create_and_edit($detailed_payment['data']['id'], $datas);
+                $payment = $this->payments_model->create_and_edit($detailed_payment['data']['id'], $datas);
             } else {
                 $datas['status'] = 'UNPAID';
-                $student = $this->payments_model->create_and_edit(0, $datas);
+                $payment = $this->payments_model->create_and_edit(0, $datas);
             }
 
-            if (@$student['status']) {
-                if (!empty(@$student['data']['insert_id'])) {
+            if (@$payment['status']) {
+                if (!empty(@$payment['data']['insert_id'])) {
                     $output = [
                         'status' => true,
                         'code' => 'CREATE',
                         'message' => 'Create data payment for student number ' . @$datas['student_number'] . ' successfully.',
                         'level' => 'success',
                     ];
-                } elseif (!empty(@$student['data']['effected_id'])) {
+                } elseif (!empty(@$payment['data']['effected_id'])) {
                     $output = [
                         'status' => true,
                         'code' => 'UPDATE',
@@ -401,11 +487,11 @@ class Leads extends CI_Controller
                         'level' => 'success',
                     ];
                 } else {
-                    $output = get_error_info($student);
+                    $output = get_error_info($payment);
                     $output['status'] = false;
                 }
-            } elseif (!empty($student)) {
-                $output = get_error_info($student);
+            } elseif (!empty($payment)) {
+                $output = get_error_info($payment);
             }
         }
 
@@ -427,9 +513,9 @@ class Leads extends CI_Controller
             ]);
 
             if (!empty($fees['data'])) {
-                $datas['amount'] = $fees['data']['advance_amount'] - ($fees['data']['advance_amount'] * ((float) @$datas['tax_percent'] / 100));
+                $datas['amount'] = $fees['data']['final_amount'] - ($fees['data']['final_amount'] * ((float) @$datas['tax_percent'] / 100));
                 $datas['tax_percent'] = @$datas['tax_percent'];
-                $datas['final_amount'] = $fees['data']['advance_amount'];
+                $datas['final_amount'] = $fees['data']['final_amount'];
             }
 
             $detailed_student = $this->students_model->detailed(0, 'student_number = ' . $this->db->escape($datas['student_number']));
@@ -453,6 +539,7 @@ class Leads extends CI_Controller
             }
 
             if (@$invoices['status']) {
+                $update_booked_number = update_booked_number(1, $datas['invoice_number']);
                 if (!empty(@$invoices['data']['insert_id'])) {
                     $output = [
                         'status' => true,
@@ -460,8 +547,6 @@ class Leads extends CI_Controller
                         'message' => 'Invoice for student number "' . @$datas['student_number'] . '" successfully created and submitted to admin.',
                         'level' => 'success',
                     ];
-
-                    update_booked_number(1, $datas['invoice_number']);
                 } elseif (!empty(@$invoices['data']['effected_id'])) {
                     $output = [
                         'status' => true,
@@ -491,6 +576,10 @@ class Leads extends CI_Controller
         $utilitys = null;
         $alert = null;
         $input_post = @$this->input->post();
+
+        if (!empty($input_post)) {
+            $utilitys['call_log_input'] = $input_post;
+        }
 
         $utilitys['religion'] = $this->leads_model->religion();
         $data_get_universities = [
@@ -569,12 +658,20 @@ class Leads extends CI_Controller
 
             sys_error_logs($create);
             if (@$create['status'] && (!empty(@$create['data']['insert_id']))) {
+                $update_booked_number = update_booked_number(1, $input_post['enquiry_number']);
                 $alert = [
                     'code' => 'CREATE',
                     'message' => 'Add data leads successfully.',
                     'level' => 'success',
                     'redirectUrl' => base_url() . "$this->module/edit/" . encryptcst($create['data']['insert_id'])
                 ];
+
+                $contact_log = $this->create_contact_log_from_form(
+                    $create['data']['insert_id'],
+                    $input_post,
+                    'NEW_LEAD'
+                );
+                $this->append_contact_log_result($alert, $contact_log);
 
                 if (@$input_post['status'] === 'YES') {
                     $student = $this->create_or_edit_student($input_post);
@@ -590,9 +687,6 @@ class Leads extends CI_Controller
                         }
                     }
                 }
-
-                // Set enquiry booking number
-                update_booked_number(1, $input_post['enquiry_number']);
             } elseif (!empty($create)) {
                 # Set string geolocation
                 if (!empty($input_post['country_id'])) {
@@ -656,6 +750,10 @@ class Leads extends CI_Controller
         $toastr = null;
         $input_post = @$this->input->post();
         $id = decryptcst($id);
+
+        if (!empty($input_post)) {
+            $utilitys['call_log_input'] = $input_post;
+        }
 
         $utilitys['religion'] = $this->leads_model->religion();
         $data_get_universities = [
@@ -733,13 +831,21 @@ class Leads extends CI_Controller
             $edit = $this->leads_model->create_and_edit($id, $input_post);
 
             sys_error_logs($edit);
-            if (@$edit['status'] && (!empty(@$edit['data']['effected_id']))) {
+            $lead_update_accepted = @$edit['status'] && (
+                !empty(@$edit['data']['effected_id'])
+                || (!empty($input_post['record_call']) && @$edit['code'] === 'LEAD-PTC-E001')
+            );
+
+            if ($lead_update_accepted) {
                 $alert = [
                     'code' => 'UPDATE',
                     'message' => 'Update data successfully.',
                     'level'   => 'success',
-                    'redirectUrl' => base_url() . "$this->module/edit/" . encryptcst($edit['data']['effected_id'])
+                    'redirectUrl' => base_url() . "$this->module/edit/" . encryptcst($id)
                 ];
+
+                $contact_log = $this->create_contact_log_from_form($id, $input_post, 'FOLLOW_UP');
+                $this->append_contact_log_result($alert, $contact_log);
             } elseif (!empty($edit)) {
                 $alert = get_error_info($edit);
             }

@@ -98,6 +98,19 @@ $(document).ready(function() {
     $('button[type="submit"]').on('click', function(e) {
         let form = $(this).attr('form');
         let $form = $(form)
+        let hasFile = false;
+
+        $('input[type="file"]').each(function() {
+            if ($(this)[0].files.length > 0) {
+                hasFile = true;
+            }
+        });
+
+        if (hasFile) {
+            $('form').attr('enctype', 'multipart/form-data');
+        } else {
+            $('form').removeAttr('enctype');
+        }
 
         $form.trigger('submit');
     })

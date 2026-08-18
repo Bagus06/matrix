@@ -6,5 +6,6 @@ switch ($this->uri->rsegments[2]) {
         echo '<link rel="stylesheet" href="' . $base_directory . 'upload.css">';
         echo '<link rel="stylesheet" href="' . $base_directory . 'edit.css">';
         echo '<link rel="stylesheet" href="' . $base_directory . 'table_detailed_student_info.css">';
+        echo '<link rel="stylesheet" href="' . $base_directory . 'yearrangepicker.css">';
         break;
 };

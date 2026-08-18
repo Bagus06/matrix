@@ -22,6 +22,7 @@ class Students extends CI_Controller
         parent::__construct();
         # Uncomment for use user login check
         check_auth();
+        sync_booked_number('student_number', 'students');
 
         $this->load->model('students_model');
 
@@ -29,6 +30,7 @@ class Students extends CI_Controller
         $this->load->model('university_courses/university_courses_model');
         $this->load->model('payments/payments_model');
         $this->load->model('payment_invoices/payment_invoices_model');
+        $this->load->model('payment_methods/payment_methods_model');
         $this->load->model('leads/leads_model');
 
         $this->load->model('geolocation/countries_model');
@@ -76,6 +78,7 @@ class Students extends CI_Controller
         ];
         $prefix = date('my');
         $student_number = last_booked_number($prefix, 4);
+
         $create = create_booked_number($student_number);
 
         if ($create) {
@@ -301,43 +304,44 @@ class Students extends CI_Controller
         $output = null;
         if (!empty($datas)) {
             $detailed_payment = $this->payments_model->detailed(0, 'student_number = ' . $this->db->escape(@$datas['student_number']));
+            $detailed_payment_invoice = $this->payment_invoices_model->detailed(0, 'student_number = ' . $this->db->escape(@$datas['student_number']));
 
             $fees = $this->payments_model->calculation_fee([
                 'course_id' => @$datas['course_id'],
                 'source_code' => @$datas['source_code'],
                 'tax_percent' => @$datas['tax_percent'],
                 'advance_percent' => @$datas['advance_percent'],
-                'aditional_discount_percent' => @$datas['aditional_discount_percent'],
+                'aditional_discount' => @$datas['aditional_discount'],
                 'additional_certificate_fee' => @$datas['additional_certificate_fee'],
             ]);
 
             if (!empty($fees['data'])) {
                 $datas['total_amount'] = $fees['data']['total_amount'];
-                $datas['discount_percent'] = @$fees['data']['discount_percent'];
+                $datas['discount'] = @$fees['data']['discount'];
                 $datas['tax_percent'] = @$datas['tax_percent'];
                 $datas['final_amount'] = $fees['data']['final_amount'];
                 $datas['advance_percent'] = @$datas['advance_percent'];
                 $datas['advance_amount'] = $fees['data']['advance_amount'];
-                $datas['remaining_balance'] = $fees['data']['remaining_balance'];
+                $datas['remaining_balance'] = ((strtoupper(@$detailed_payment_invoice['data']['approval_status']) === 'APPROVED') ? $fees['data']['remaining_balance'] : @$detailed_payment['data']['remaining_balance']);
                 $datas['final_payment'] = (float) preg_match('/^\d+(\.\d{1,2})?$/', $amount = preg_replace('/[^0-9.]/', '', $fees['data']['final_payment'])) ? $amount : 0;
             }
 
             if (!empty($detailed_payment['data']['id'])) {
-                $student = $this->payments_model->create_and_edit($detailed_payment['data']['id'], $datas);
+                $payment = $this->payments_model->create_and_edit($detailed_payment['data']['id'], $datas);
             } else {
                 $datas['status'] = 'UNPAID';
-                $student = $this->payments_model->create_and_edit(0, $datas);
+                $payment = $this->payments_model->create_and_edit(0, $datas);
             }
 
-            if (@$student['status']) {
-                if (!empty(@$student['data']['insert_id'])) {
+            if (@$payment['status']) {
+                if (!empty(@$payment['data']['insert_id'])) {
                     $output = [
                         'status' => true,
                         'code' => 'CREATE',
                         'message' => 'Create data payment for student number ' . @$datas['student_number'] . ' successfully.',
                         'level' => 'success',
                     ];
-                } elseif (!empty(@$student['data']['effected_id'])) {
+                } elseif (!empty(@$payment['data']['effected_id'])) {
                     $output = [
                         'status' => true,
                         'code' => 'UPDATE',
@@ -345,11 +349,11 @@ class Students extends CI_Controller
                         'level' => 'success',
                     ];
                 } else {
-                    $output = get_error_info($student);
-                    $output['status'] = false;
+                    $output = get_error_info($payment);
+                    $output['status'] = true;
                 }
-            } elseif (!empty($student)) {
-                $output = get_error_info($student);
+            } elseif (!empty($payment)) {
+                $output = get_error_info($payment);
             }
         }
 
@@ -360,35 +364,23 @@ class Students extends CI_Controller
     {
         $output = null;
         if (!empty($datas)) {
-            $detailed_payment = $this->payment_invoices_model->detailed(0, 'student_number = ' . $this->db->escape(@$datas['student_number']));
-
-            $fees = $this->payments_model->calculation_fee([
-                'course_id' => @$datas['course_id'],
-                'source_code' => @$datas['source_code'],
-                'tax_percent' => @$datas['tax_percent'],
-                'advance_percent' => @$datas['advance_percent'],
-                'aditional_discount_percent' => @$datas['aditional_discount_percent'],
-                'additional_certificate_fee' => @$datas['additional_certificate_fee'],
-            ]);
-
-            if (!empty($fees['data'])) {
-                $datas['amount'] = $fees['data']['advance_amount'] - ($fees['data']['advance_amount'] * ((float) @$datas['tax_percent'] / 100));
-                $datas['tax_percent'] = @$datas['tax_percent'];
-                $datas['final_amount'] = $fees['data']['advance_amount'];
-                $datas['final_amount'] = $fees['data']['advance_amount'];
-            }
-
+            $detailed_payment = $this->payments_model->detailed(0, 'student_number = ' . $this->db->escape(@$datas['student_number']));
+            $detailed_payment_invoice = $this->payment_invoices_model->detailed(0, 'student_number = ' . $this->db->escape(@$datas['student_number']));
             $detailed_student = $this->students_model->detailed(0, 'student_number = ' . $this->db->escape($datas['student_number']));
+
             if (!empty($detailed_student['data'])) {
                 $datas['information'] = 'Fee for studying at ' . @$detailed_student['data']['university_name'] . ' (' . @$detailed_student['data']['short_name'] . ')' . ((!empty(@$detailed_student['data']['city'])) ? ', ' . @$detailed_student['data']['city'] : '') . ' for ' . @$detailed_student['data']['course_name'] . ' (' . @$detailed_student['data']['course_code'] . ') Course';
             } else {
                 $datas['information'] = 'Fee for studying.';
             }
 
-            if (!empty($detailed_payment['data']['id'])) {
+            if (!empty($detailed_payment_invoice['data']['id'])) {
+                $datas['amount'] = $detailed_payment['data']['final_amount'] - ($detailed_payment['data']['final_amount'] * ((float) @$detailed_payment['data']['tax_percent'] / 100));
+                $datas['tax_percent'] = @$detailed_payment['data']['tax_percent'];
+                $datas['final_amount'] = $detailed_payment['data']['final_amount'];
                 $datas['request_date'] = date('Y-m-d');
 
-                $invoices = $this->payment_invoices_model->create_and_edit($detailed_payment['data']['id'], $datas);
+                $invoices = $this->payment_invoices_model->create_and_edit($detailed_payment_invoice['data']['id'], $datas);
             } else {
                 $datas['approval_status'] = 'WAITING';
                 $datas['sending_status'] = 0;
@@ -417,7 +409,7 @@ class Students extends CI_Controller
                     ];
                 } else {
                     $output = get_error_info($invoices);
-                    $output['status'] = false;
+                    $output['status'] = true;
                 }
             } elseif (!empty($invoices)) {
                 $output = get_error_info($invoices);
@@ -546,6 +538,30 @@ class Students extends CI_Controller
             'whereclause' => ""
         ];
         $utilitys['leads_sources'] = $this->leads_sources_model->leads_sources(0, $data_get_leads_sources, 'GET');
+
+        $get_params = [
+            'select' => '*',
+            'row_status' => 1,
+            'outputtype' => 'data',
+            'order_by' => [
+                'column' => 'account_name',
+                'order' => 'ASC'
+            ],
+            'limit' => [
+                'length' => -1,
+                'start' => 0
+            ],
+            'bypass' => true,
+            'whereclause' => ''
+        ];
+        $payment_methods = $this->payment_methods_model->payment_methods('', $get_params, 'GET');
+
+        if (!empty($payment_methods['data']['data'])) {
+            $utilitys['payment_methods'] = [];
+            foreach ($payment_methods['data']['data'] as $key => $value) {
+                $utilitys['payment_methods'][$value['method_code']] = $value;
+            }
+        }
 
         $utilitys['priority'] = $this->leads_model->priority();
         $utilitys['status'] = $this->leads_model->status();

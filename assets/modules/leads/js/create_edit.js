@@ -15,11 +15,10 @@ $(document).ready(function() {
         $('input[name="session"]'),
         $('input[name="invoice_number"]'),
         $('input[name="total_amount"]'),
-        $('input[name="discount_percent"]'),
+        $('input[name="discount"]'),
         $('input[name="final_amount"]'),
         $('input[name="advance_amount"]'),
         $('input[name="advance_percent"]'),
-        $('input[name="remaining_balance"]'),
         $('input[name="due_date"]')
     ];
     var baseLabel = [];
@@ -93,14 +92,14 @@ $(document).ready(function() {
                     if (response.status) {
                         $('input[name="final_fees"]').val(response.data.final_amount)
                         $('input[name="total_amount"]').val(response.data.total_amount)
-                        $('input[name="discount_percent"]').val(response.data.discount_percent)
+                        $('input[name="discount"]').val(response.data.discount)
                         $('input[name="final_amount"]').val(response.data.final_amount)
                         $('input[name="advance_amount"]').val(response.data.advance_amount)
                         $('input[name="remaining_balance"]').val(response.data.remaining_balance)
                     } else {
                         $('input[name="final_fees"]').val('')
                         $('input[name="total_amount"]').val('')
-                        $('input[name="discount_percent"]').val('')
+                        $('input[name="discount"]').val('')
                         $('input[name="final_amount"]').val('')
                         $('input[name="advance_amount"]').val('')
                         $('input[name="remaining_balance"]').val('')
@@ -109,7 +108,7 @@ $(document).ready(function() {
                 error: function() {
                     $('input[name="final_fees"]').val('')
                     $('input[name="total_amount"]').val('')
-                    $('input[name="discount_percent"]').val('')
+                    $('input[name="discount"]').val('')
                     $('input[name="final_amount"]').val('')
                     $('input[name="advance_amount"]').val('')
                     $('input[name="remaining_balance"]').val('')
@@ -221,10 +220,10 @@ $(document).ready(function() {
             $('input[name="student_number"]').val('')
             $('input[name="final_fees"]').val('')
             $('input[name="total_amount"]').val('')
-            $('input[name="discount_percent"]').val('')
+            $('input[name="discount"]').val('')
             $('input[name="advance_amount"]').val('')
-            $('input[name="final_amount"]').val('')
             $('input[name="remaining_balance"]').val('')
+            $('input[name="final_amount"]').val('')
         }
 
         setMandatory(status)

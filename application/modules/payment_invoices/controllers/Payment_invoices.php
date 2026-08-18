@@ -26,6 +26,7 @@ class Payment_invoices extends CI_Controller
         parent::__construct();
         # Uncomment for use user login check
         check_auth();
+        sync_booked_number('invoice_number', 'payment_invoices');
 
         $this->load->model('payment_invoices_model');
         $this->load->model('students/students_model');
@@ -73,6 +74,7 @@ class Payment_invoices extends CI_Controller
         ];
         $prefix = '#INV-' . date('Y');
         $student_number = last_booked_number($prefix, 4);
+
         $create = create_booked_number($student_number);
 
         if ($create) {
@@ -463,17 +465,22 @@ class Payment_invoices extends CI_Controller
                 'source_code' => @$datas['source_code'],
                 'tax_percent' => @$datas['tax_percent'],
                 'advance_percent' => @$datas['advance_percent'],
+                'aditional_discount' => @$datas['aditional_discount'],
+                'additional_certificate_fee' => @$datas['additional_certificate_fee'],
             ]);
 
             if (!empty($fees['data'])) {
                 $datas['total_amount'] = $fees['data']['total_amount'];
-                $datas['discount_percent'] = @$fees['data']['discount_percent'];
+                $datas['additional_certificate_fee'] = $datas['additional_certificate_fee'];
+                $datas['discount'] = @$fees['data']['discount'];
+                $datas['aditional_discount'] = @$fees['data']['aditional_discount'];
+                $datas['total_discount'] = @$fees['data']['total_discount'];
                 $datas['tax_percent'] = @$datas['tax_percent'];
                 $datas['final_amount'] = $fees['data']['final_amount'];
                 $datas['advance_percent'] = @$datas['advance_percent'];
                 $datas['advance_amount'] = $fees['data']['advance_amount'];
                 $datas['remaining_balance'] = $fees['data']['remaining_balance'];
-                $datas['final_payment'] = number_format((float) preg_match('/^\d+(\.\d{1,2})?$/', $amount = preg_replace('/[^0-9.]/', '', $fees['data']['final_payment'])) ? $amount : 0, 2);
+                $datas['final_payment'] = (float) preg_match('/^\d+(\.\d{1,2})?$/', $amount = preg_replace('/[^0-9.]/', '', $fees['data']['final_payment'])) ? $amount : 0;
             }
 
             if (!empty($detailed_payment['data']['id'])) {
@@ -521,11 +528,13 @@ class Payment_invoices extends CI_Controller
                 'source_code' => @$datas['source_code'],
                 'tax_percent' => @$datas['tax_percent'],
                 'advance_percent' => @$datas['advance_percent'],
+                'aditional_discount' => @$datas['aditional_discount'],
+                'additional_certificate_fee' => @$datas['additional_certificate_fee'],
             ]);
             if (!empty($fees['data'])) {
-                $datas['amount'] = number_format($fees['data']['advance_amount'] - ($fees['data']['advance_amount'] * (number_format((float) @$datas['tax_percent'], 2) / 100)), 2);
-                $datas['tax_percent'] = @$datas['tax_percent'];
-                $datas['final_amount'] = $fees['data']['advance_amount'];
+                $datas['amount'] = $detailed_payment['data']['final_amount'] - ($detailed_payment['data']['final_amount'] * ((float) @$detailed_payment['data']['tax_percent'] / 100));
+                $datas['tax_percent'] = @$detailed_payment['data']['tax_percent'];
+                $datas['final_amount'] = $detailed_payment['data']['final_amount'];
             }
 
             $detailed_student = $this->students_model->detailed(0, 'student_number = ' . $this->db->escape($datas['student_number']));
@@ -604,8 +613,12 @@ class Payment_invoices extends CI_Controller
                     'invoice_number' => @$detailed_payment['data']['invoice_number'],
                     'tax_percent' => @$input_post['tax_percent'],
                     'advance_percent' => @$input_post['advance_percent'],
+                    'discount' => @$input_post['discount'],
+                    'aditional_discount' => @$input_post['aditional_discount'],
+                    'additional_certificate_fee' => @$input_post['additional_certificate_fee'],
                     'course_id' => @$detailed_student['data']['course_id'],
                     'source_code' => @$detailed_leads['data']['source_code'],
+                    'assigned_to' => @$input_post['assigned_to'],
                     'approval_by' => get_user()['id'],
                     'approval_date' => date('Y-m-d'),
                     'invoice_date' => date('Y-m-d'),
@@ -615,7 +628,6 @@ class Payment_invoices extends CI_Controller
                 $invoice = $this->create_or_edit_invoices($datas);
                 $toastr[] = $invoice;
 
-                $datas['advance_date'] = date('Y-m-d');
                 $datas['due_date'] = $input_post['due_date'];
 
                 $payment = $this->create_or_edit_payments($datas);

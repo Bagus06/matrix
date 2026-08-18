@@ -97,7 +97,7 @@ class University_courses_model extends CI_model
                         return $output;
                     } else {
                         $get_params = [
-                            "select" => "id",
+                            "select" => "$this->tb1.id",
                             "row_status" => $data["row_status"],
                             "outputtype" => "query",
                             "order_by" => [
@@ -119,7 +119,7 @@ class University_courses_model extends CI_model
                 }
             } else {
                 $get_params = [
-                    "select" => "id",
+                    "select" => "$this->tb1.id",
                     "row_status" => $data["row_status"],
                     "outputtype" => "query",
                     "order_by" => [

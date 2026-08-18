@@ -15,10 +15,12 @@ switch ($this->uri->rsegments[2]) {
         echo '<script src="' . $base_directory . 'create.js"></script>';
     case 'edit':
         // echo '<script src="' . $base_directory . '{js file name}';
+        echo '<script src="' . $base_directory . 'yearrangespicker.js"></script>';
         echo '<script src="' . $base_directory . 'create_edit.js"></script>';
         echo '<script src="' . $base_directory . 'upload.js"></script>';
         echo '<script src="' . $base_directory . 'leads_sources.js"></script>';
         echo '<script src="' . $base_directory . 'courses.js"></script>';
         echo '<script src="' . $base_directory . 'geolocation.js"></script>';
+        echo '<script src="' . $base_directory . 'contact_logs.js"></script>';
         break;
 };

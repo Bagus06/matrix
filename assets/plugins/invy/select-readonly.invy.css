@@ -1,0 +1,29 @@
+/* Select biasa */
+
+select[readonly] {
+    background-color: #e9ecef !important;
+    cursor: not-allowed;
+}
+
+
+/* Select2 Single */
+
+select[readonly]+.select2 .select2-selection--single {
+    background-color: #e9ecef !important;
+    cursor: not-allowed;
+}
+
+
+/* Select2 Multiple */
+
+select[readonly]+.select2 .select2-selection--multiple {
+    background-color: #e9ecef !important;
+    cursor: not-allowed;
+}
+
+
+/* Text Select2 */
+
+select[readonly]+.select2 .select2-selection__rendered {
+    color: #495057 !important;
+}

@@ -1,4 +1,11 @@
-<?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
+<?php
+defined('BASEPATH') or exit('No direct script access allowed');
+$is_lead_edit = !empty($utilitys['data']['id']);
+$call_permission = $is_lead_edit ? 'FT_LDS_EDT' : 'FT_LDS_CRT';
+$can_record_call = permit_check($call_permission, get_user()['id']);
+$call_log_input = !empty($utilitys['call_log_input']) ? $utilitys['call_log_input'] : [];
+$record_call = !empty($call_log_input['record_call']);
+?>
 <form method="post" action="" enctype="multipart/form-data">
     <div class="col-12 p-0 m-0 row">
         <div class="col-12 col-md-12 col-xl-7">
@@ -202,7 +209,31 @@
                         </div>
                         <div class="form-group">
                             <label class="mb-0" id="lbl-session">Session</label>
-                            <input type="date" class="form-control bg-transparent" placeholder="YYYY-MM-DD" inputmode="numeric" pattern="^\d{4}-\d{2}-\d{2}$" autocomplete="off" name="session" value="<?= ((!empty($utilitys['data_student']['session'])) ? $utilitys['data_student']['session'] : @$utilitys['data']['session']) ?>">
+                            <input type="text" class="form-control bg-transparent yearrangepicker" placeholder="Study Periode" autocomplete="off" name="session" value="<?= @$utilitys['data_student']['session']; ?>" readonly>
+                            <div class="year-dropdown">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <label>Start Year</label>
+                                        <select id="startYear" class="form-control">
+                                        </select>
+                                    </div>
+                                    <div class="col-6">
+                                        <label>End Year</label>
+                                        <select id="endYear" class="form-control">
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="mt-3 text-right">
+                                    <button type="button" class="btn btn-secondary btn-sm" id="cancelYear">
+                                        Cancel
+                                    </button>
+
+                                    <button type="button" class="btn btn-primary btn-sm" id="applyYear">
+                                        Apply
+                                    </button>
+                                </div>
+
+                            </div>
                             <small class="text-danger pl-3" id="err-session" style="display: none;"></small>
                         </div>
                         <div class="form-group">
@@ -344,6 +375,38 @@
             </div>
         </div>
         <div class="col-12 col-md-12 col-xl-5">
+            <?php if ($can_record_call): ?>
+                <div class="card" id="call-activity-card">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <span class="text-lg font-weight-bold"><i class="fa-solid fa-phone"></i> CALL ACTIVITY</span>
+                            <a href="<?= !empty($utilitys['data']['phone']) ? 'tel:' . preg_replace('/[^0-9+]/', '', $utilitys['data']['phone']) : '#'; ?>"
+                                class="btn btn-sm btn-outline-primary <?= empty($utilitys['data']['phone']) ? 'disabled' : ''; ?>"
+                                id="lead-phone-call"><i class="fa-solid fa-phone mr-1"></i> Call</a>
+                        </div>
+                        <hr>
+                        <div class="custom-control custom-checkbox mb-3">
+                            <input type="checkbox" class="custom-control-input" id="record-call" name="record_call" value="1" <?= $record_call ? 'checked' : ''; ?>>
+                            <label class="custom-control-label" for="record-call">Record this call when the lead is saved</label>
+                        </div>
+                        <div class="form-group">
+                            <label class="mb-0" id="lbl-contact_result">Call Result <span class="text-danger">*</span></label>
+                            <select class="form-control bg-transparent call-log-input" name="contact_result" <?= $record_call ? 'required' : 'disabled'; ?>>
+                                <option value="">--SELECT--</option>
+                                <option value="RESPONDED" <?= @$call_log_input['contact_result'] === 'RESPONDED' ? 'selected' : ''; ?>>Responded</option>
+                                <option value="NO_RESPONSE" <?= @$call_log_input['contact_result'] === 'NO_RESPONSE' ? 'selected' : ''; ?>>No Response</option>
+                            </select>
+                            <small class="text-muted">This is the call outcome, not the lead conversion status.</small>
+                        </div>
+                        <div class="form-group mb-0">
+                            <label class="mb-0" id="lbl-contact_note">Call Note</label>
+                            <textarea class="form-control bg-transparent call-log-input" name="contact_note" rows="3" maxlength="255"
+                                placeholder="Optional call note" <?= $record_call ? '' : 'disabled'; ?>><?= html_escape(@$call_log_input['contact_note']); ?></textarea>
+                        </div>
+                        <small class="text-info d-block mt-3"><i class="fa-solid fa-circle-info mr-1"></i>The call log is created only after this lead form is saved successfully.</small>
+                    </div>
+                </div>
+            <?php endif; ?>
             <div class="card">
                 <div class="card-body">
                     <span class="text-lg font-weight-bold"><i class="fa-solid fa-wallet"></i> PAYMENT INFORMATION</span>
@@ -359,9 +422,9 @@
                         <small class="text-danger pl-3" id="err-total_amount" style="display: none;"></small>
                     </div>
                     <div class="form-group">
-                        <label class="mb-0" id="lbl-discount_percent">Discount</label>
-                        <input type="number" class="form-control bg-transparant" name="discount_percent" inputmode="decimal" step="0.01" min="0" value="<?= @$utilitys['data_payment']['discount_percent'] ?>" readonly>
-                        <small class="text-danger pl-3" id="err-discount_percent" style="display: none;"></small>
+                        <label class="mb-0" id="lbl-discount">Discount</label>
+                        <input type="number" class="form-control bg-transparant" name="discount" placeholder="Enter amount (INR)" inputmode="decimal" step="0.01" min="0" title="Enter amount in Indian Rupees (numbers only, up to 2 decimals)" value="<?= @$utilitys['data_payment']['discount'] ?>" readonly>
+                        <small class="text-danger pl-3" id="err-discount" style="display: none;"></small>
                     </div>
                     <div class="form-group">
                         <label class="mb-0" id="lbl-tax_percent">TAX</label>
@@ -369,8 +432,8 @@
                         <small class="text-danger pl-3" id="err-tax_percent" style="display: none;"></small>
                     </div>
                     <div class="form-group">
-                        <label class="mb-0" id="lbl-final_amount">Final Payment</label>
-                        <input type="number" class="form-control bg-transparant" name="final_amount" placeholder="Enter amount (INR)" inputmode="decimal" step="0.01" min="0" title="Enter amount in Indian Rupees (numbers only, up to 2 decimals)" value="<?= @$utilitys['data_payment']['final_amount'] ?>" readonly>
+                        <label id="lbl-final_amount">Final Amount</label>
+                        <input type="number" class="form-control bg-transparant" name="final_amount" inputmode="decimal" step="0.01" min="0" value="<?= @$utilitys['data_payment']['final_amount'] ?>" readonly>
                         <small class="text-danger pl-3" id="err-final_amount" style="display: none;"></small>
                     </div>
                     <div class="form-group">
@@ -386,8 +449,8 @@
                         <small class="text-danger pl-3" id="err-advance_amount" style="display: none;"></small>
                     </div>
                     <div class="form-group">
-                        <label class="mb-0" id="lbl-remaining_balance">Remaining Balance</label>
-                        <input type="number" class="form-control bg-transparant" name="remaining_balance" placeholder="Enter amount (INR)" inputmode="decimal" step="0.01" min="0" title="Enter amount in Indian Rupees (numbers only, up to 2 decimals)" value="<?= @$utilitys['data_payment']['remaining_balance'] ?>" readonly>
+                        <label id="lbl-remaining_balance">Remaining Balance</label>
+                        <input type="number" class="form-control bg-transparant" name="remaining_balance" inputmode="decimal" step="0.01" min="0" value="<?= @$utilitys['data_payment']['remaining_balance'] ?>" readonly>
                         <small class="text-danger pl-3" id="err-remaining_balance" style="display: none;"></small>
                     </div>
                     <div class="form-group">

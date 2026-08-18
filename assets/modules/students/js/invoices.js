@@ -111,7 +111,7 @@ $(document).ready(function() {
         let courseID = $('select[name="course_id"]').val()
         let sourceCode = $('select[name="source_code"]').val()
         let taxPercent = $('input[name="tax_percent"]').val()
-        let aditionalDiscountPercent = $('input[name="aditional_discount_percent"]').val()
+        let aditionalDiscount = $('input[name="aditional_discount"]').val()
         let advancePercent = $('input[name="advance_percent"]').val()
         let additionalCertificateFee = $('input[name="additional_certificate_fee"]').val()
 
@@ -124,7 +124,7 @@ $(document).ready(function() {
                 course_id: courseID,
                 source_code: sourceCode,
                 tax_percent: taxPercent,
-                aditional_discount_percent: aditionalDiscountPercent,
+                aditional_discount: aditionalDiscount,
                 advance_percent: advancePercent,
                 additional_certificate_fee: additionalCertificateFee
             },
@@ -135,16 +135,16 @@ $(document).ready(function() {
                 if (response.status) {
                     $('input[name="final_fees"]').val(response.data.final_amount)
                     $('input[name="total_amount"]').val(response.data.total_amount)
-                    $('input[name="discount_percent"]').val(response.data.discount_percent)
-                    $('input[name="total_discount_percent"]').val(response.data.total_discount_percent)
+                    $('input[name="discount"]').val(response.data.discount)
+                    $('input[name="total_discount"]').val(response.data.total_discount)
                     $('input[name="remaining_balance"]').val(response.data.remaining_balance)
                     $('input[name="advance_amount"]').val(response.data.advance_amount)
                     $('input[name="final_amount"]').val(response.data.final_amount)
                 } else {
                     $('input[name="final_fees"]').val('')
                     $('input[name="total_amount"]').val('')
-                    $('input[name="discount_percent"]').val('')
-                    $('input[name="total_discount_percent"]').val('')
+                    $('input[name="discount"]').val('')
+                    $('input[name="total_discount"]').val('')
                     $('input[name="remaining_balance"]').val('')
                     $('input[name="advance_amount"]').val('')
                     $('input[name="final_amount"]').val('')
@@ -153,8 +153,8 @@ $(document).ready(function() {
             error: function() {
                 $('input[name="final_fees"]').val('')
                 $('input[name="total_amount"]').val('')
-                $('input[name="discount_percent"]').val('')
-                $('input[name="total_discount_percent"]').val('')
+                $('input[name="discount"]').val('')
+                $('input[name="total_discount"]').val('')
                 $('input[name="remaining_balance"]').val('')
                 $('input[name="advance_amount"]').val('')
                 $('input[name="final_amount"]').val('')
@@ -163,7 +163,7 @@ $(document).ready(function() {
         $.loader('hide')
     }
 
-    $('input[name="tax_percent"], input[name="advance_percent"], input[name="aditional_discount_percent"], input[name="additional_certificate_fee"]').on('input', function() {
+    $('input[name="tax_percent"], input[name="advance_percent"], input[name="aditional_discount"], input[name="additional_certificate_fee"]').on('input', function() {
         onChangePayment()
     })
 
@@ -254,18 +254,24 @@ $(document).ready(function() {
         let invoiceStatus = $(this).data('invoicestatus')
         let invoiceNumber = $('input[name="invoice_number"]').val()
         let studentNumber = $('input[name="student_number"]').val()
-        let paymentDiscount = $('input[name="discount_percent"]').val()
+        let paymentDiscount = $('input[name="discount"]').val()
+        let aditionalDiscount = $('input[name="aditional_discount"]').val()
+        let additionalCertificateFee = $('input[name="additional_certificate_fee"]').val()
         let paymentTAX = $('input[name="tax_percent"]').val()
         let paymentAdvancePercent = $('input[name="advance_percent"]').val()
         let dueDate = $('input[name="due_date"]').val()
+        let assignedTo = $('select[name="assigned_to"]').val()
 
         let data = {
             student_number: studentNumber,
             invoice_number: invoiceNumber,
-            discount_percent: paymentDiscount,
+            discount: paymentDiscount,
+            aditional_discount: aditionalDiscount,
+            additional_certificate_fee: additionalCertificateFee,
             tax_percent: paymentTAX,
             advance_percent: paymentAdvancePercent,
-            due_date: dueDate
+            due_date: dueDate,
+            assigned_to: assignedTo
         };
 
         if (invoiceStatus === 'APPROVED') {

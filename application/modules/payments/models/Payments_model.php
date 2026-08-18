@@ -579,7 +579,7 @@ class Payments_model extends CI_model
         ];
         $data = [
             'total_amount' => 0,
-            'discount_percent' => 0,
+            'discount' => 0,
         ];
 
         if (!empty($datas['course_id'])) {
@@ -588,7 +588,7 @@ class Payments_model extends CI_model
                 $data['total_amount'] += (float) $detailed_course['data']['final_fee'];
 
                 if (($detailed_course['data']['discount_duration_start'] <= date('Y-m-d')) && ($detailed_course['data']['discount_duration_end'] >= date('Y-m-d'))) {
-                    $data['discount_percent'] += (float) $detailed_course['data']['discount_percent'];
+                    $data['discount'] += (float) @$detailed_course['data']['discount'];
                 }
             }
 
@@ -602,33 +602,30 @@ class Payments_model extends CI_model
             $detailed_source = $this->leads_sources_model->detailed(0, 'source_code = ' . $this->db->escape($datas['source_code']));
             if (!empty($detailed_source['data'])) {
                 if (($detailed_source['data']['source_name'] === 'B2B') || ($detailed_source['data']['source_name'] === 'REFERANCE')) {
-                    $data['discount_percent'] += (float) $detailed_source['data']['discount_percent'];
+                    $data['discount'] += (float) $detailed_source['data']['discount'];
                 }
             }
         }
 
         if (!empty($data['total_amount'])) {
-            if (!empty($datas['aditional_discount_percent'])) {
-                $data['aditional_discount_percent'] = (float) $datas['aditional_discount_percent'];
-                $data['total_discount_percent'] = $data['discount_percent'] + (float) $datas['aditional_discount_percent'];
+            if (!empty($datas['aditional_discount'])) {
+                $data['aditional_discount'] = (float) $datas['aditional_discount'];
+                $data['total_discount'] = $data['discount'] + (float) $datas['aditional_discount'];
             } else {
-                $data['aditional_discount_percent'] = 0;
-                $data['total_discount_percent'] = $data['discount_percent'];
+                $data['aditional_discount'] = 0;
+                $data['total_discount'] = $data['discount'];
             }
 
             $data['final_amount'] = $data['total_amount'] + ($data['total_amount'] * ((float) $datas['tax_percent'] / 100));
-            $data['final_amount'] = $data['final_amount'] - ($data['final_amount'] * ($data['total_discount_percent'] / 100));
+            $data['final_amount'] = $data['final_amount'] - $data['total_discount'];
 
             $data['advance_amount'] = $data['final_amount'] * ((float) $datas['advance_percent'] / 100);
-
-            $data['remaining_balance'] = $data['final_amount'] - $data['advance_amount'];
-
             $data['final_payment'] = $data['final_amount'] - $data['advance_amount'];
+            $data['remaining_balance'] = $data['final_payment'];
 
-
-            $data['aditional_discount_percent'] = number_format($data['aditional_discount_percent'], 2, '.', '');
-            $data['discount_percent'] = number_format($data['discount_percent'], 2, '.', '');
-            $data['total_discount_percent'] = number_format($data['total_discount_percent'], 2, '.', '');
+            $data['aditional_discount'] = number_format($data['aditional_discount'], 2, '.', '');
+            $data['discount'] = number_format($data['discount'], 2, '.', '');
+            $data['total_discount'] = number_format($data['total_discount'], 2, '.', '');
             $data['total_amount'] = number_format($data['total_amount'], 2, '.', '');
             $data['final_amount'] = number_format($data['final_amount'], 2, '.', '');
             $data['advance_amount'] = number_format($data['advance_amount'], 2, '.', '');
@@ -735,24 +732,21 @@ class Payments_model extends CI_model
         if (!empty($datas)) {
             $data_post = [
                 'student_number' => substr($datas['student_number'], 0, 15),
-                'total_amount' => round((float) preg_match('/^\d+(\.\d{1,2})?$/', $amount = preg_replace('/[^0-9.]/', '', @$datas['total_amount'])) ? $amount : 0, 2),
-                'additional_certificate_fee' => round((float) preg_match('/^\d+(\.\d{1,2})?$/', $amount = preg_replace('/[^0-9.]/', '', @$datas['additional_certificate_fee'])) ? $amount : 0, 2),
-                'discount_percent' => round((float) preg_match('/^\d+(\.\d{1,2})?$/', $amount = preg_replace('/[^0-9.]/', '', @$datas['discount_percent'])) ? $amount : 0, 2),
-                'aditional_discount_percent' => round((float) preg_match('/^\d+(\.\d{1,2})?$/', $amount = preg_replace('/[^0-9.]/', '', @$datas['aditional_discount_percent'])) ? $amount : 0, 2),
-                'total_discount_percent' => round((float) preg_match('/^\d+(\.\d{1,2})?$/', $amount = preg_replace('/[^0-9.]/', '', @$datas['total_discount_percent'])) ? $amount : 0, 2),
-                'tax_percent' => round((float) preg_match('/^\d+(\.\d{1,2})?$/', $amount = preg_replace('/[^0-9.]/', '', @$datas['tax_percent'])) ? $amount : 0, 2),
-                'final_amount' => round((float) preg_match('/^\d+(\.\d{1,2})?$/', $amount = preg_replace('/[^0-9.]/', '', @$datas['final_amount'])) ? $amount : 0, 2),
-                'advance_percent' => round((float) preg_match('/^\d+(\.\d{1,2})?$/', $amount = preg_replace('/[^0-9.]/', '', @$datas['advance_percent'])) ? $amount : 0, 2),
-                'advance_amount' => round((float) preg_match('/^\d+(\.\d{1,2})?$/', $amount = preg_replace('/[^0-9.]/', '', @$datas['advance_amount'])) ? $amount : 0, 2),
-                'advance_date' => date('Y-m-d', strtotime(@$datas['advance_date'])),
                 'invoice_number' => substr(@$datas['invoice_number'], 0, 15),
-                'advance_receipt_number' => substr(@$datas['advance_receipt_number'], 0, 15),
-                'remaining_balance' => round((float) preg_match('/^\d+(\.\d{1,2})?$/', $amount = preg_replace('/[^0-9.]/', '', @$datas['remaining_balance'])) ? $amount : 0, 2),
+                'total_amount' =>  preg_match('/^\d+(\.\d{1,2})?$/', $amount = round((float) preg_replace('/[^0-9.]/', '', @$datas['total_amount']), 2)) ? $amount : 0,
+                'additional_certificate_fee' =>  preg_match('/^\d+(\.\d{1,2})?$/', $amount = round((float) preg_replace('/[^0-9.]/', '', @$datas['additional_certificate_fee']), 2)) ? $amount : 0,
+                'discount' =>  preg_match('/^\d+(\.\d{1,2})?$/', $amount = round((float) preg_replace('/[^0-9.]/', '', @$datas['discount']), 2)) ? $amount : 0,
+                'aditional_discount' =>  preg_match('/^\d+(\.\d{1,2})?$/', $amount = round((float) preg_replace('/[^0-9.]/', '', @$datas['aditional_discount']), 2)) ? $amount : 0,
+                'total_discount' =>  preg_match('/^\d+(\.\d{1,2})?$/', $amount = round((float) preg_replace('/[^0-9.]/', '', @$datas['total_discount']), 2)) ? $amount : 0,
+                'tax_percent' =>  preg_match('/^\d+(\.\d{1,2})?$/', $amount = round((float) preg_replace('/[^0-9.]/', '', @$datas['tax_percent']), 2)) ? $amount : 0,
+                'final_amount' =>  preg_match('/^\d+(\.\d{1,2})?$/', $amount = round((float) preg_replace('/[^0-9.]/', '', @$datas['final_amount']), 2)) ? $amount : 0,
+                'advance_percent' =>  preg_match('/^\d+(\.\d{1,2})?$/', $amount = round((float) preg_replace('/[^0-9.]/', '', @$datas['advance_percent']), 2)) ? $amount : 0,
+                'advance_amount' =>  preg_match('/^\d+(\.\d{1,2})?$/', $amount = round((float) preg_replace('/[^0-9.]/', '', @$datas['advance_amount']), 2)) ? $amount : 0,
+                'advance_date' => date('Y-m-d', strtotime(@$datas['advance_date'])),
+                'remaining_balance' =>  preg_match('/^\d+(\.\d{1,2})?$/', $amount = round((float) preg_replace('/[^0-9.]/', '', @$datas['remaining_balance']), 2)) ? $amount : 0,
                 'due_date' => date('Y-m-d', strtotime(@$datas['due_date'])),
-                'final_payment' => round((float) preg_match('/^\d+(\.\d{1,2})?$/', $amount = preg_replace('/[^0-9.]/', '', @$datas['final_payment'])) ? $amount : 0, 2),
+                'final_payment' =>  preg_match('/^\d+(\.\d{1,2})?$/', $amount = round((float) preg_replace('/[^0-9.]/', '', @$datas['final_payment']), 2)) ? $amount : 0,
                 'final_payment_date' => date('Y-m-d', strtotime(@$datas['final_payment_date'])),
-                'final_invoice_number' => substr(@$datas['final_invoice_number'], 0, 15),
-                'final_receipt_number' => substr(@$datas['final_receipt_number'], 0, 15),
                 'status' => substr(@$datas['status'], 0, 50),
                 'updated_by' => get_user()['id']
             ];
@@ -764,10 +758,7 @@ class Payments_model extends CI_model
             if (empty($datas['invoice_number'])) {
                 unset($data_post['invoice_number']);
             }
-            if (empty($datas['advance_receipt_number'])) {
-                unset($data_post['advance_receipt_number']);
-            }
-            if (empty($datas['remaining_balance'])) {
+            if (($datas['remaining_balance'] != 0) && empty($datas['remaining_balance'])) {
                 unset($data_post['remaining_balance']);
             }
             if (empty($datas['due_date'])) {
@@ -778,12 +769,6 @@ class Payments_model extends CI_model
             }
             if (empty($datas['final_payment_date'])) {
                 unset($data_post['final_payment_date']);
-            }
-            if (empty($datas['final_invoice_number'])) {
-                unset($data_post['final_invoice_number']);
-            }
-            if (empty($datas['final_receipt_number'])) {
-                unset($data_post['final_receipt_number']);
             }
             if (empty($datas['due_date'])) {
                 unset($data_post['due_date']);

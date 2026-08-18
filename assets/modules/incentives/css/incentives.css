@@ -1,0 +1,87 @@
+#incentive-report .card h3 { font-variant-numeric: tabular-nums; }
+#incentive-report .table td, #incentive-report .table th { vertical-align: middle; }
+#incentive-report [data-money] { white-space: nowrap; }
+#incentive-summary-table { min-width: 1480px; }
+#incentive-summary-table thead th { white-space: nowrap; }
+
+#incentive-summary-table .incentive-column-groups th {
+    padding-top: .55rem;
+    padding-bottom: .55rem;
+    background: #f4f6f9;
+    color: #5f6b78;
+    font-size: .72rem;
+    letter-spacing: .035em;
+    text-transform: uppercase;
+}
+
+#incentive-summary-table .incentive-performance-start,
+#incentive-summary-table .incentive-deferred-start,
+#incentive-summary-table .incentive-payout-start {
+    border-left: 2px solid #d8dee5;
+}
+
+#incentive-report .incentive-column-help {
+    display: inline-block;
+    padding: 0;
+    border: 0;
+    color: #6c8ebf;
+    font-size: .78rem;
+    line-height: 1;
+    vertical-align: middle;
+}
+
+#incentive-report .incentive-column-help:hover,
+#incentive-report .incentive-column-help:focus {
+    color: #2767ad;
+    box-shadow: none;
+    text-decoration: none;
+}
+
+.popover { max-width: 340px; }
+#incentive-slabs-table input { min-width: 110px; }
+
+#incentive-setup .incentive-rule-card {
+    flex: 1 1 auto;
+    width: 100%;
+    margin-bottom: 0;
+    overflow: hidden;
+}
+
+#incentive-setup .incentive-rule-card .card-header {
+    padding: 1rem 1.25rem .35rem;
+}
+
+#incentive-setup .incentive-rule-card .card-body {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    padding: .75rem 1.25rem 1rem;
+}
+
+#incentive-setup .incentive-rule-card label {
+    display: flex;
+    align-items: flex-end;
+    min-height: 2.2em;
+    margin-bottom: .45rem;
+    font-size: .875rem;
+    line-height: 1.1;
+}
+
+#incentive-setup .incentive-rule-card .form-group {
+    margin-bottom: .75rem;
+}
+
+#incentive-setup .incentive-rule-note {
+    margin-top: auto;
+    padding-top: .75rem;
+    border-top: 1px solid rgba(0, 0, 0, .08);
+    color: #6c757d;
+    font-size: .8125rem;
+    line-height: 1.4;
+}
+
+@media (max-width: 767.98px) {
+    #incentive-setup .incentive-rule-card label {
+        min-height: 0;
+    }
+}

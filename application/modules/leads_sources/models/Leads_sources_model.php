@@ -587,6 +587,10 @@ class Leads_sources_model extends CI_model
                 'prefix' => '#REF.BB',
             ],
             5 => [
+                'source_name' => 'FUTURE SCREEN',
+                'prefix' => '#REF.FS',
+            ],
+            6 => [
                 'source_name' => 'OTHER',
                 'prefix' => '#REF.OT',
             ],
@@ -688,7 +692,7 @@ class Leads_sources_model extends CI_model
                 'b2b_company_name' => substr(@$datas['b2b_company_name'], 0, 100),
                 'ref_name' => substr(@$datas['ref_name'], 0, 100),
                 'address' => @$datas['address'],
-                'discount' => round((float) @$datas['discount'], 2),
+                'discount' => preg_match('/^\d+(\.\d{1,2})?$/', $amount = round((float) preg_replace('/[^0-9.]/', '', @$datas['discount']), 2)) ? $amount : 0,
                 'phone' => preg_replace('/[^0-9]/', '', substr(@$datas['phone'], 0, 15)),
                 'email' => substr(@$datas['email'], 0, 100),
                 'updated_by' => get_user()['id']

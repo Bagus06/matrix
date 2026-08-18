@@ -70,7 +70,7 @@
                     if (is_file($logo)) {
                         $logo = base_url() . '/uploads/universities_logo/' .  @$utilitys['data']['logo'];
                     } else {
-                        $logo = 'https://dummyimage.com/400/bababa/a6a6a6';
+                        $logo = base_url() . 'assets/img/profile/sample.png';
                     }
                     ?>
                     <img src="<?= $logo; ?>"

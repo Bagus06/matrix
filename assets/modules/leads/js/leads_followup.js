@@ -7,7 +7,6 @@ $(document).ready(function() {
         async: true,
         dataType: 'json',
         success: function(response) {
-            console.log(response)
             if (response.status) {
                 menu.append(`<span class="badge badge-danger navbar-badge">` + response.data.filtered_record + `</span>`);
             }

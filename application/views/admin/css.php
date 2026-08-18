@@ -11,6 +11,7 @@
 <link rel="stylesheet" href="<?= base_url() ?>assets/plugins/sweetalert2/bootstrap-4.min.css">
 <link rel="stylesheet" href="<?= base_url() ?>assets/plugins/toastr/toastr.min.css">
 <link rel="stylesheet" href="<?= base_url(); ?>assets/plugins/invy/col-table-style.invy.css">
+<link rel="stylesheet" href="<?= base_url(); ?>assets/plugins/invy/select-readonly.invy.css">
 <link rel="stylesheet" href="<?= base_url(); ?>assets/plugins/select2/css/select2.min.css">
 <link rel="stylesheet" href="<?= base_url(); ?>assets/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
 <link rel="stylesheet" href="<?= base_url(); ?>assets/plugins/intl-tel-input/intlTelInput.css">

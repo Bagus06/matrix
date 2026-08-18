@@ -1038,7 +1038,6 @@ class Leads_model extends CI_model
                     if (!empty($output['data'])) {
                         $output['data']['update'] = true;
 
-                        // Set booked number to used true
                         update_booked_number(1, $data_post['enquiry_number']);
                     }
                 } else {
@@ -1061,7 +1060,6 @@ class Leads_model extends CI_model
                     $output = $this->leads(null, $data_post, 'POST');
 
                     if (!empty($output['data'])) {
-                        // Set booked number to used true
                         update_booked_number(1, $data_post['enquiry_number']);
                     }
                 } else {

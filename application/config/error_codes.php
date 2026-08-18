@@ -3011,4 +3011,162 @@ $config['error_codes'] = [
             ],
         ],
     ],
+
+    // ===================== RECEIPT =====================
+    'RECT' => [
+        'DTL' => [ // Error function detailed()
+            'E001' => [
+                'message' => 'The data you are looking for was not found',
+                'hint'    => 'The data you are looking for does not exist in the database.',
+                'level'   => 'warning',
+                'cobtn' => FALSE,
+                'cotext' => null,
+                'cabtn' => TRUE,
+                'catext' => 'OK',
+                'redirectUrl' => null
+            ],
+            'E002' => [
+                'message' => 'A system error has occurred. Please report the problem to the administrator and check the system again.',
+                'hint'    => 'Query error.',
+                'level'   => 'error',
+                'cobtn' => FALSE,
+                'cotext' => null,
+                'cabtn' => TRUE,
+                'catext' => 'OK',
+                'redirectUrl' => null
+            ],
+            'E003' => [
+                'message' => 'A system error has occurred. Please report the problem to the administrator and check the system again.',
+                'hint'    => 'ID and WhereClaus are empty.',
+                'level'   => 'warning',
+                'cobtn' => FALSE,
+                'cotext' => null,
+                'cabtn' => TRUE,
+                'catext' => 'OK',
+                'redirectUrl' => null
+            ],
+        ],
+        'PTC' => [ // Error in model 'receipt()' and in patch section
+            'E001' => [
+                'message' => 'The data is up to date.',
+                'hint'    => '',
+                'level'   => 'info',
+                'cobtn' => FALSE,
+                'cotext' => null,
+                'cabtn' => TRUE,
+                'catext' => 'OK',
+                'redirectUrl' => null
+            ]
+        ],
+        'DEL' => [ // Error in model 'receipt()' and in delete section
+            'E001' => [
+                'message' => 'A system error has occurred. Please report the problem to the administrator and check the system again.',
+                'hint'    => 'Query error.',
+                'level'   => 'error',
+                'cobtn' => FALSE,
+                'cotext' => null,
+                'cabtn' => TRUE,
+                'catext' => 'OK',
+                'redirectUrl' => null
+            ],
+            'E002' => [
+                'message' => 'A system error has occurred. Please report the problem to the administrator and check the system again.',
+                'hint'    => 'Empty ID.',
+                'level'   => 'error',
+                'cobtn' => FALSE,
+                'cotext' => null,
+                'cabtn' => TRUE,
+                'catext' => 'OK',
+                'redirectUrl' => null
+            ],
+        ],
+        'PDL' => [ // Error in model 'receipt()' and in delete section
+            'E001' => [
+                'message' => 'A system error has occurred. Please report the problem to the administrator and check the system again.',
+                'hint'    => 'Query error.',
+                'level'   => 'error',
+                'cobtn' => FALSE,
+                'cotext' => null,
+                'cabtn' => TRUE,
+                'catext' => 'OK',
+                'redirectUrl' => null
+            ],
+            'E002' => [
+                'message' => 'A system error has occurred. Please report the problem to the administrator and check the system again.',
+                'hint'    => 'Empty ID.',
+                'level'   => 'error',
+                'cobtn' => FALSE,
+                'cotext' => null,
+                'cabtn' => TRUE,
+                'catext' => 'OK',
+                'redirectUrl' => null
+            ],
+        ],
+        'RST' => [ // Error in model 'receipt()' and in restore section
+            'E001' => [
+                'message' => 'A system error has occurred. Please report the problem to the administrator and check the system again.',
+                'hint'    => 'Empty ID.',
+                'level'   => 'error',
+                'cobtn' => FALSE,
+                'cotext' => null,
+                'cabtn' => TRUE,
+                'catext' => 'OK',
+                'redirectUrl' => null
+            ],
+            'E002' => [
+                'message' => 'Sorry, the data you are restoring already exists. Do you still want to replace it?',
+                'hint'    => 'Duplicate data.',
+                'level'   => 'question',
+                'cobtn' => FALSE,
+                'cotext' => null,
+                'cabtn' => TRUE,
+                'catext' => 'OK',
+                'redirectUrl' => null
+            ],
+        ],
+        'CNU' => [ // Error model function create_and_edit()
+            'E001' => [
+                'message' => 'Sorry, the data you entered already exists.',
+                'hint'    => "The data entered already exists in the database, search based on the 'receipt_number' column",
+                'level'   => 'warning',
+                'cobtn' => FALSE,
+                'cotext' => null,
+                'cabtn' => TRUE,
+                'catext' => 'OK',
+                'redirectUrl' => null
+            ],
+            'E002' => [
+                'message' => 'A system error has occurred. Please report the problem to the administrator and check the system again.',
+                'hint'    => "insert data is empty.",
+                'level'   => 'error',
+                'cobtn' => FALSE,
+                'cotext' => null,
+                'cabtn' => TRUE,
+                'catext' => 'OK',
+                'redirectUrl' => null
+            ],
+        ],
+        'RRC' => [ // Error in controller function release_receipt()
+            'E001' => [
+                'message' => 'Sorry, student data was not found. Please check again.',
+                'hint'    => "Download function failed on controller",
+                'level'   => 'warning',
+                'cobtn' => TRUE,
+                'cotext' => null,
+                'cabtn' => TRUE,
+                'catext' => 'OK',
+                'redirectUrl' => null
+            ],
+            'E002' => [
+                'message' => 'Please release the invoice first, then try again.',
+                'hint'    => "The invoice status is still 'waiting.'",
+                'level'   => 'warning',
+                'cobtn' => TRUE,
+                'cotext' => null,
+                'cabtn' => TRUE,
+                'catext' => 'OK',
+                'redirectUrl' => null
+            ]
+        ]
+    ],
 ];
